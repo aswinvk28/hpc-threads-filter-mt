@@ -26,8 +26,8 @@ struct FrameParams
  */
 struct Frame
 {
-  vector<vector<float*>> _pointers;
-  vector<vector<float*>> __pointers;
+  vector< vector<float*> > _pointers = vector< vector<float*> > ( 64 , vector<float*>(4) );
+  vector< vector<float*> > __pointers = vector< vector<float*> > ( 64, vector<float*>(4) );
   vector<vector<float>> sum;
 };
 
@@ -42,17 +42,14 @@ void append_vec(std::vector<long> &v1, std::vector<long> &v2) {
  * low performance tuning parameters as higher time to traverse through parallely
  */
 void calculate_vector_sum(Frame * frame, const int m, long p) {
-  #pragma ivdep
-  #pragma omp simd
-  #pragma vector nontemporal
-  #pragma vector aligned
+  #pragma omp parallel for
   for(int i = 0; i < (1<<6); i++) {
     #pragma omp simd
     for(int aa = 0; aa < (1<<2); aa++) {
       #pragma omp simd
       for(int j = 1; j <= (1<<4); j++) {
-        frame->_pointers[i][0][j-1] += frame->_pointers[i][aa][p*(1<<4) + j-1];
-        frame->__pointers[i][0][j-1] += frame->__pointers[i][aa][p*(1<<4) + j-1];
+        frame->_pointers[i][aa][j-1] += frame->_pointers[i][aa][p*(1<<4) + j-1];
+        frame->__pointers[i][aa][j-1] += frame->__pointers[i][aa][p*(1<<4) + j-1];
       }
     }
   }
@@ -72,13 +69,16 @@ void calculate_row_sum(std::vector<Frame*> frames, const int m) {
     #pragma vector aligned
     for(int ii = 0; ii < (1<<6); ii++) {
       #pragma omp simd
-      for(int i = 1; i <= (1<<1); i++) {
-        #pragma ivdep
+      for(int aa = 0; aa < (1<<2); aa++) {
         #pragma omp simd
-        for(long j = 1; j < (1<<3); j+=2) {
-          ptrdiff_t offset = (i-1)*(1<<3) + j-1;
-          frames[a]->_pointers[ii][0][offset] += frames[a]->_pointers[ii][0][offset+1];
-          frames[a]->__pointers[ii][0][offset] += frames[a]->__pointers[ii][0][offset+1];
+        for(int i = 1; i <= (1<<1); i++) {
+          #pragma ivdep
+          #pragma omp simd
+          for(long j = 1; j < (1<<3); j+=2) {
+            ptrdiff_t offset = (i-1)*(1<<3) + j-1;
+            frames[a]->_pointers[ii][0][offset] += frames[a]->_pointers[ii][aa][offset+1];
+            frames[a]->__pointers[ii][0][offset] += frames[a]->__pointers[ii][aa][offset+1];
+          }
         }
       }
     }
@@ -97,13 +97,16 @@ void calculate_odd_row_sum(std::vector<Frame*> frames, const int m) {
     #pragma vector aligned
     for(int ii = 0; ii < (1<<6); ii++) {
       #pragma omp simd
-      for(long i = 1; i <= (1<<1); i++) {
-        #pragma ivdep
+      for(int aa = 0; aa < (1<<2); aa++) {
         #pragma omp simd
-        for(long j = 1; j < (1<<3); j+=4) {
-          ptrdiff_t offset = (i-1)*(1<<3) + j-1;
-          frames[a]->_pointers[ii][0][offset] += frames[a]->_pointers[ii][0][offset+2];
-          frames[a]->__pointers[ii][0][offset] += frames[a]->__pointers[ii][0][offset+2];
+        for(long i = 1; i <= (1<<1); i++) {
+          #pragma ivdep
+          #pragma omp simd
+          for(long j = 1; j < (1<<3); j+=4) {
+            ptrdiff_t offset = (i-1)*(1<<3) + j-1;
+            frames[a]->_pointers[ii][0][offset] += frames[a]->_pointers[ii][aa][offset+2];
+            frames[a]->__pointers[ii][0][offset] += frames[a]->__pointers[ii][aa][offset+2];
+          }
         }
       }
     }
@@ -121,6 +124,29 @@ void calculate_odd_row_sum(std::vector<Frame*> frames, const int m) {
 //   }
 // }
 
+void execute_task_for_sum(Frame * frame, const int m, int p)
+{
+  for(int i = p; i < 16 + p; i++) {
+    #pragma omp task
+    {
+      calculate_vector_sum(frame, m, i);
+    }
+  }
+}
+
+void execute_section_for_frame(Frame * frame, const int m)
+{
+  #pragma omp single nowait
+  {
+    for(int i = 0; i <= 3; i++) {
+      #pragma omp task
+      {
+        execute_task_for_sum(frame, m, i*16);
+      }
+    }
+  }
+}
+
 /**
  * breadth
  * (1<<4) section offsets, (1<<4) task offsets, (1<<4) offsets, (1<<6) pointers
@@ -128,74 +154,35 @@ void calculate_odd_row_sum(std::vector<Frame*> frames, const int m) {
  * (1<<2) pointers, (1<<3) vectors
  * (1<<3) offset_equator1, (1<<4) offset_equator2
  */
-void load_frame(Frame * frame, float * data, unsigned long index) {
-  int ii;
-  for(ii = 0; ii < (1<<6); ii++) {
-    vector<float*> _pointers;
-    for(int i = 0; i < 1<<2; i++) {
-      _pointers.emplace_back(&data[(ii*(1<<2)+i)*(1<<5)*(1<<5) + index]);
-    }
-    frame->_pointers.emplace_back(_pointers);
-  }
-  for(ii = 0; ii < (1<<6); ii++) {
-    vector<float*> __pointers;
-    for(int i = 0; i < 1<<2; i++) {
-      __pointers.emplace_back(&data[(1<<18) + (ii*(1<<2)+i)*(1<<5)*(1<<5) + index]);
-    }
-    frame->__pointers.emplace_back(__pointers);
-  }
-}
-
-void execute_task_for_sum(Frame * frame, const int m, int p)
-{
-  #pragma omp single nowait
-  {
-    for(int i = p; i < 16 + p; i++) {
-      #pragma omp task
-      {
-        calculate_vector_sum(frame, m, i);
-      }
-    }
-  }
-}
-
-void execute_section_for_frame(Frame * frame, const int m)
-{
-  #pragma omp parallel
-  {
-    #pragma omp sections nowait
-    {
-      #pragma omp section
-      {
-        execute_task_for_sum(frame, m, 0);
-      }
-      #pragma omp section
-      {
-        execute_task_for_sum(frame, m, 16);
-      }
-      #pragma omp section
-      {
-        execute_task_for_sum(frame, m, 32);
-      }
-      #pragma omp section
-      {
-        execute_task_for_sum(frame, m, 48);
-      }
-    }
-  }
-}
-
-/**
- * depth
- * (1<<4) objects, (1<<3) vectors, (1<<8) frames
- */
 void initialise_frames(vector<Frame*>& frames, float * data, int num_frames)
 {
   #pragma omp parallel for
-  for(int i = 0; i < num_frames; i++) {
+  for(int j = 0; j < num_frames; j++) {
     Frame * frame = new Frame();
-    load_frame(frame, data, i*(1UL<<22));
-    frames[i] = frame;
+    frames[j] = frame;
+    #pragma omp parallel sections
+    {
+      #pragma omp section
+      {
+        #pragma omp simd
+        for(int ii = 0; ii < (1<<6); ii++) {
+          #pragma omp simd
+          for(int i = 0; i < 1<<2; i++) {
+            frames[j]->_pointers[ii][i] = &data[(ii*(1<<2)+i)*(1<<5)*(1<<5) + j*(1UL<<22)];
+          }
+        }
+      }
+      #pragma omp section
+      {
+        #pragma omp simd
+        for(int ii = 0; ii < (1<<6); ii++) {
+          #pragma omp simd
+          for(int i = 0; i < 1<<2; i++) {
+            frames[j]->__pointers[ii][i] = &data[(1<<18) + (ii*(1<<2)+i)*(1<<5)*(1<<5) + j*(1UL<<22)];
+          }
+        }
+      }
+    }
   }  
 }
 
@@ -228,11 +215,155 @@ void filter(const long n, const long m, float *data, const float threshold, std:
   const double t3 = omp_get_wtime();
 
   // execution (sum) of 18 members
+  // sections created to test
   #pragma omp parallel
   {
-    #pragma omp for nowait
-    for(int i = 0; i < frames.size(); i++) {
-      execute_section_for_frame(frames[i], m);
+    #pragma omp sections nowait
+    {
+      #pragma omp section
+      {
+        for(int i = 0; i < frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = frames.size()/(1<<4); i < 2*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 2*frames.size()/(1<<4); i < 3*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 3*frames.size()/(1<<4); i < 4*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 4*frames.size()/(1<<4); i < 5*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 5*frames.size()/(1<<4); i < 6*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 6*frames.size()/(1<<4); i < 7*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 7*frames.size()/(1<<4); i < 8*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 8*frames.size()/(1<<4); i < 9*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 9*frames.size()/(1<<4); i < 10*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 10*frames.size()/(1<<4); i < 11*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 11*frames.size()/(1<<4); i < 12*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 12*frames.size()/(1<<4); i < 13*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 13*frames.size()/(1<<4); i < 14*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 14*frames.size()/(1<<4); i < 15*frames.size()/(1<<4); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int i = 15*frames.size()/(1<<4); i < frames.size(); i++) {
+          #pragma omp task
+          {
+            execute_section_for_frame(frames[i], m);
+          }
+        }
+      }
     }
   }
 

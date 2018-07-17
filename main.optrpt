@@ -4,7 +4,7 @@ See "https://software.intel.com/en-us/intel-advisor-xe" for details.
 
 Intel(R) C++ Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.210 Build 20180410
 
-Compiler options: /Qopt-report=5 /QaxMIC-AVX512 /Qopenmp /Qmkl /Qstd=c++11 /o:app
+Compiler options: /Qopt-report=5 /QaxMIC-AVX512 /Qopenmp /Qmkl /Qstd=c++11 /Qm64 /o:app
 
     Report from: Interprocedural optimizations [ipo]
 

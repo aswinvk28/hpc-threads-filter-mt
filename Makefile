@@ -1,5 +1,5 @@
 CXX=icl
-CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11
+CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64
 OPTRPT=-Qopt-report=5
 
 default : app
@@ -16,4 +16,4 @@ queue: app
 	TIMEIT -m 0x1 app.exe
 
 clean :
-	rm app worker.obj *.optrpt
+	rm app.exe worker.obj *.optrpt
