@@ -86,7 +86,7 @@ void task_calculate_row_sum(Frame * frame)
 void calculate_row_sum(std::vector<Frame*> frames, const int m) {
   #pragma omp parallel
   {
-    #pragma omp sections
+    #pragma omp sections nowait
     {
       #pragma omp section
       {
@@ -236,27 +236,178 @@ void calculate_row_sum(std::vector<Frame*> frames, const int m) {
   }
 }
 
+void task_calculate_odd_row_sum(Frame * frame)
+{
+  #pragma ivdep
+  #pragma omp simd
+  #pragma vector nontemporal
+  #pragma vector aligned
+  for(int ii = 0; ii < (1<<6); ii++) {
+    #pragma omp simd
+    for(int aa = 0; aa < (1<<2); aa++) {
+      #pragma omp simd
+      for(long i = 1; i <= (1<<1); i++) {
+        #pragma ivdep
+        #pragma omp simd
+        for(long j = 1; j < (1<<3); j+=4) {
+          ptrdiff_t offset = (i-1)*(1<<3) + j-1;
+          frame->_pointers[ii][0][offset] += frame->_pointers[ii][aa][offset+2];
+          frame->__pointers[ii][0][offset] += frame->__pointers[ii][aa][offset+2];
+        }
+      }
+    }
+  }
+}
+
 /**
  * depth
  */
 void calculate_odd_row_sum(std::vector<Frame*> frames, const int m) {
-  #pragma omp parallel for
-  for(int a = 0; a < frames.size(); a++) {
-    #pragma ivdep
-    #pragma omp simd
-    #pragma vector nontemporal
-    #pragma vector aligned
-    for(int ii = 0; ii < (1<<6); ii++) {
-      #pragma omp simd
-      for(int aa = 0; aa < (1<<2); aa++) {
-        #pragma omp simd
-        for(long i = 1; i <= (1<<1); i++) {
-          #pragma ivdep
-          #pragma omp simd
-          for(long j = 1; j < (1<<3); j+=4) {
-            ptrdiff_t offset = (i-1)*(1<<3) + j-1;
-            frames[a]->_pointers[ii][0][offset] += frames[a]->_pointers[ii][aa][offset+2];
-            frames[a]->__pointers[ii][0][offset] += frames[a]->__pointers[ii][aa][offset+2];
+  #pragma omp parallel
+  {
+    #pragma omp sections nowait
+    {
+      #pragma omp section
+      {
+        for(int a = 0; a < frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = frames.size()/(1<<4); a < 2*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 2*frames.size()/(1<<4); a < 3*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 3*frames.size()/(1<<4); a < 4*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 4*frames.size()/(1<<4); a < 5*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 5*frames.size()/(1<<4); a < 6*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 6*frames.size()/(1<<4); a < 7*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 7*frames.size()/(1<<4); a < 8*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 8*frames.size()/(1<<4); a < 9*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 9*frames.size()/(1<<4); a < 10*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 10*frames.size()/(1<<4); a < 11*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 11*frames.size()/(1<<4); a < 12*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 12*frames.size()/(1<<4); a < 13*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 13*frames.size()/(1<<4); a < 14*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 14*frames.size()/(1<<4); a < 15*frames.size()/(1<<4); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
+          }
+        }
+      }
+      #pragma omp section
+      {
+        for(int a = 15*frames.size()/(1<<4); a < frames.size(); a++) {
+          #pragma omp task
+          {
+            task_calculate_odd_row_sum(frames[a]);
           }
         }
       }
