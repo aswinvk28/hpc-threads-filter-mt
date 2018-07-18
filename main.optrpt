@@ -38,16 +38,14 @@ INLINE REPORT: (main(int, char **)) [1/95=1.1%] Y:\Courses\Parallelism on Intel 
   -> EXTERN: (36,27) malloc(size_t)
   -> EXTERN: (37,29) omp_get_wtime()
   -> EXTERN: (39,3) vslNewStream(VSLStreamStatePtr *, int, unsigned int)
-  -> (41,3) printf(const char *, ...) (isz = 21) (sz = 28)
-     [[ Unable to inline callsite  <1>]]
-  -> (48,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 14) (sz = 21)
-     [[ Called routine is noinline  <2>]]
-  -> (53,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 14) (sz = 21)
-     [[ Called routine is noinline  <2>]]
+  -> (46,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 14) (sz = 21)
+     [[ Called routine is noinline  <1>]]
+  -> (51,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 14) (sz = 21)
+     [[ Called routine is noinline  <1>]]
+  -> EXTERN: (52,21) omp_get_wtime()
+  -> EXTERN: (53,3) filter(long, long, float *, float, std::vector<long, std::allocator<long>> &)
   -> EXTERN: (54,21) omp_get_wtime()
-  -> EXTERN: (55,3) filter(long, long, float *, float, std::vector<long, std::allocator<long>> &)
-  -> EXTERN: (56,21) omp_get_wtime()
-  -> INLINE (MANUAL): (59,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
+  -> INLINE (MANUAL): (57,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(920,3) std::vector<long, std::allocator<long>>::_Tidy(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
       -> DELETED: (2001,9) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Orphan_all(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 12)
       -> INLINE (MANUAL): (2003,13) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
@@ -85,7 +83,7 @@ INLINE REPORT: (main(int, char **)) [1/95=1.1%] Y:\Courses\Parallelism on Intel 
       -> INLINE (MANUAL): (2010,10) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myend(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
         -> INLINE (MANUAL): (629,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 4) (sz = 11)
           -> INLINE (MANUAL): (599,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (59,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
+  -> INLINE (MANUAL): (57,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(920,3) std::vector<long, std::allocator<long>>::_Tidy(std::vector<long, std::allocator<long>> *) (isz = 171) (sz = 176)
       -> DELETED: (2001,9) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Orphan_all(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 12)
       -> INLINE (MANUAL): (2003,13) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
@@ -123,75 +121,75 @@ INLINE REPORT: (main(int, char **)) [1/95=1.1%] Y:\Courses\Parallelism on Intel 
       -> INLINE (MANUAL): (2010,10) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myend(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
         -> INLINE (MANUAL): (629,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 4) (sz = 11)
           -> INLINE (MANUAL): (599,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (59,25) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> INLINE (MANUAL): (57,25) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (59,50) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> INLINE (MANUAL): (57,50) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> (61,5) printf(const char *, ...) (isz = 21) (sz = 28)
-     [[ Unable to inline callsite  <1>]]
-  -> INLINE (MANUAL): (61,103) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> (59,5) printf(const char *, ...) (isz = 21) (sz = 28)
+     [[ Unable to inline callsite  <2>]]
+  -> INLINE (MANUAL): (59,103) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (61,126) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> INLINE (MANUAL): (59,126) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (64,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> INLINE (MANUAL): (62,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (64,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
+  -> INLINE (MANUAL): (62,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 24) (sz = 31)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,40) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Mylast(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (624,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1764,58) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (614,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(const std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) const (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (604,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(const std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) const (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (65,36) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 10) (sz = 19)
+  -> INLINE (MANUAL): (63,36) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 10) (sz = 19)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1801,17) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (609,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (599,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) (isz = 1) (sz = 7)
-  -> INLINE (MANUAL): (65,57) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 10) (sz = 19)
+  -> INLINE (MANUAL): (63,57) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 10) (sz = 19)
     -> INLINE (MANUAL): Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector:(1801,17) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Myfirst(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 7) (sz = 14)
       -> INLINE (MANUAL): (609,11) std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Get_data(std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>> *) (isz = 4) (sz = 11)
         -> INLINE (MANUAL): (599,19) std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1>::_Get_second(std::_Compressed_pair<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Alty, std::_Vector_val<std::_Vector_alloc<std::_Vec_base_types<long, std::allocator<long>>>::_Val_types>, 1> *) (isz = 1) (sz = 7)
-  -> (69,7) printf(const char *, ...) (isz = 21) (sz = 28)
-     [[ Unable to inline callsite  <1>]]
-  -> (72,7) printf(const char *, ...) (isz = 21) (sz = 28)
-     [[ Unable to inline callsite  <1>]]
+  -> (67,7) printf(const char *, ...) (isz = 21) (sz = 28)
+     [[ Unable to inline callsite  <2>]]
+  -> (70,7) printf(const char *, ...) (isz = 21) (sz = 28)
+     [[ Unable to inline callsite  <2>]]
 
 
     Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
 
 
-LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\main.cc(64,44)
+LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\main.cc(62,44)
    remark #15344: loop was not vectorized: vector dependence prevents vectorization
-   remark #15346: vector dependence: assumed ANTI dependence between passed (65:7) and passed (65:7)
-   remark #15346: vector dependence: assumed FLOW dependence between passed (65:7) and passed (65:7)
+   remark #15346: vector dependence: assumed ANTI dependence between passed (63:7) and passed (63:7)
+   remark #15346: vector dependence: assumed FLOW dependence between passed (63:7) and passed (63:7)
    remark #25439: unrolled with remainder by 2  
 LOOP END
 
-LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\main.cc(64,44)
+LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\main.cc(62,44)
 <Remainder>
 LOOP END
 
@@ -206,15 +204,15 @@ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThread
         Assigned     :   14[ rax rdx rcx rbx rsi r8-r11 zmm0-zmm1 zmm3 zmm8 zmm13]
         
     Routine temporaries
-        Total         :     138
+        Total         :     136
             Global    :      52
-            Local     :      86
-        Regenerable   :      34
+            Local     :      84
+        Regenerable   :      32
         Spilled       :       5
         
     Routine stack
         Variables     :      60 bytes*
-            Reads     :      10 [6.56e+000 ~ 5.8%]
+            Reads     :      10 [6.56e+000 ~ 5.9%]
             Writes    :       8 [1.67e+000 ~ 1.5%]
         Spills        :      48 bytes*
             Reads     :       4 [3.25e+000 ~ 2.9%]
@@ -238,7 +236,7 @@ INLINE REPORT: (printf(const char *, ...)) [2/95=2.1%] C:\Program Files (x86)\Wi
   -> INLINE (MANUAL): (956,19) _vfprintf_l(FILE *, const char *, _locale_t, va_list) (isz = 5) (sz = 18)
     -> EXTERN: (641,16) __stdio_common_vfprintf(unsigned __int64, FILE *, const char *, _locale_t, va_list)
     -> (641,40) __local_stdio_printf_options() (isz = 1) (sz = 5)
-       [[ Called routine is noinline  <2>]]
+       [[ Called routine is noinline  <1>]]
   -> EXTERN: (956,31) __acrt_iob_func(unsigned int)
 
 
@@ -2885,10 +2883,10 @@ DEAD STATIC FUNCTION: (std::_Default_allocator_traits<std::allocator<long>>::max
 
 INLINING FOOTNOTES:
 
-<1> Inlining the function will lead to incorrect program behavior.
-
-<2> The routine declaration is annotated with "__declspec(noinline)".  Remove 
+<1> The routine declaration is annotated with "__declspec(noinline)".  Remove 
     this annotation to permit the compiler to inline this routine.
+
+<2> Inlining the function will lead to incorrect program behavior.
 
 <3> The compiler's heuristics indicate that the function is not profitable to 
     inline.  Override this decision by adding "__forceinline" to the 

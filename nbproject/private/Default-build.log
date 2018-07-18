@@ -1,0 +1,6 @@
+icl -c -Qopt-report=5 -QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64 -o "worker.o" "worker.cc"
+Intel(R) C++ Intel(R) 64 Compiler for applications running on Intel(R) 64, Version 18.0.3.210 Build 20180410
+Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.
+
+icl: error #10114: Microsoft Visual C++ not found in path
+make: *** [worker.o] Error 1

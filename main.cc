@@ -30,16 +30,14 @@ int main(int argc, char** argv) {
   } 
   
   
-  const int n = 1U<<15; //rows
-  const int m = 1U<<15; //columns
+  const long n = 1UL<<15; //rows
+  const long m = 1UL<<16; //columns
   
   float *data = (float *) malloc((long long)sizeof(float)*n*m);
   long random_seed = (long)(omp_get_wtime()*1000.0) % 1000L;
   VSLStreamStatePtr rnStream;
   vslNewStream( &rnStream, VSL_BRNG_MT19937, random_seed);
 
-  printf("Print\n");
-  
   //initialize 2D data
 // #pragma omp parallel for 
 //   for(long i =0; i < n; i++)
