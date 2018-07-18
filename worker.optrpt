@@ -13226,17 +13226,17 @@ LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projec
    remark #15416: vectorization support: indirect store was generated for the variable <*((((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->_gpointers>, 64-bit indexed, part of address is read from memory   [ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(288,34) ]
    remark #15415: vectorization support: non-unit strided load was generated for the variable <(((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->__gpointers)>, stride is 3   [ Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector(609,11) ]
    remark #15416: vectorization support: indirect store was generated for the variable <*((((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->__gpointer>, 64-bit indexed, part of address is read from memory   [ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(289,35) ]
-   remark #15305: vectorization support: vector length 8
-   remark #15309: vectorization support: normalized vectorization overhead 0.017
+   remark #15305: vectorization support: vector length 32
+   remark #15427: loop was completely unrolled
+   remark #15309: vectorization support: normalized vectorization overhead 0.014
    remark #15301: OpenMP SIMD LOOP WAS VECTORIZED
    remark #15452: unmasked strided loads: 32 
    remark #15463: unmasked indexed (or scatter) stores: 32 
    remark #15475: --- begin vector cost summary ---
    remark #15476: scalar cost: 1016 
-   remark #15477: vector cost: 928.000 
-   remark #15478: estimated potential speedup: 1.090 
+   remark #15477: vector cost: 855.000 
+   remark #15478: estimated potential speedup: 1.170 
    remark #15488: --- end vector cost summary ---
-   remark #25015: Estimate of max trip count of loop=8
 
    LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(273,17)
       remark #25436: completely unrolled by 2   (pre-vector) 
@@ -13559,17 +13559,17 @@ LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projec
    remark #15416: vectorization support: indirect store was generated for the variable <*((((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->_gpointers>, 64-bit indexed, part of address is read from memory   [ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(288,34) ]
    remark #15415: vectorization support: non-unit strided load was generated for the variable <(((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->__gpointers)>, stride is 3   [ Y:\Application\software\VisualStudioCommunity\VC\Tools\MSVC\14.12.25827\include\vector(609,11) ]
    remark #15416: vectorization support: indirect store was generated for the variable <*((((((((*(*frames->_Mypair->_Myval2->_Myfirst+j*8))->__gpointer>, 64-bit indexed, part of address is read from memory   [ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(289,35) ]
-   remark #15305: vectorization support: vector length 8
-   remark #15309: vectorization support: normalized vectorization overhead 0.017
+   remark #15305: vectorization support: vector length 32
+   remark #15427: loop was completely unrolled
+   remark #15309: vectorization support: normalized vectorization overhead 0.014
    remark #15301: OpenMP SIMD LOOP WAS VECTORIZED
    remark #15452: unmasked strided loads: 32 
    remark #15463: unmasked indexed (or scatter) stores: 32 
    remark #15475: --- begin vector cost summary ---
    remark #15476: scalar cost: 1016 
-   remark #15477: vector cost: 928.000 
-   remark #15478: estimated potential speedup: 1.090 
+   remark #15477: vector cost: 855.000 
+   remark #15478: estimated potential speedup: 1.170 
    remark #15488: --- end vector cost summary ---
-   remark #25015: Estimate of max trip count of loop=8
 
    LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(273,17)
       remark #25436: completely unrolled by 2   (pre-vector) 
@@ -13597,19 +13597,19 @@ Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThread
         Assigned     :   53[ rax rdx rcx rbx rbp rsi rdi r8-r12 r14-r15 zmm0-zmm31 k1-k7]
         
     Routine temporaries
-        Total         :     510
-            Global    :     139
-            Local     :     371
-        Regenerable   :     138
-        Spilled       :      60
+        Total         :    1352
+            Global    :     158
+            Local     :    1194
+        Regenerable   :     231
+        Spilled       :      25
         
     Routine stack
-        Variables     :     739 bytes*
+        Variables     :     163 bytes*
             Reads     :       6 [1.00e+000 ~ 0.0%]
-            Writes    :       9 [1.21e+001 ~ 0.2%]
-        Spills        :    1048 bytes*
-            Reads     :      78 [5.67e+002 ~ 11.5%]
-            Writes    :      79 [2.92e+002 ~ 5.9%]
+            Writes    :       9 [1.21e+001 ~ 0.4%]
+        Spills        :     328 bytes*
+            Reads     :      25 [1.64e+001 ~ 0.5%]
+            Writes    :      25 [1.75e+001 ~ 0.6%]
     
     Notes
     
@@ -13905,7 +13905,7 @@ LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projec
    remark #15478: estimated potential speedup: 0.730 
    remark #15487: type converts: 32 
    remark #15488: --- end vector cost summary ---
-   remark #25015: Estimate of max trip count of loop=32
+   remark #25015: Estimate of max trip count of loop=16
 
    LOOP BEGIN at Y:\Courses\Parallelism on Intel Architecture\Assignments\VS Projects\MultiThreadedFiltering\threads-filter\worker.cc(273,17)
       remark #25436: completely unrolled by 2   (pre-vector) 
