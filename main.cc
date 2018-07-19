@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
   
   
   const long n = 1UL<<15; //rows
-  const long m = 1UL<<16; //columns
+  const long m = 1UL<<15; //columns
   
   float *data = (float *) malloc((long long)sizeof(float)*n*m);
   long random_seed = (long)(omp_get_wtime()*1000.0) % 1000L;
