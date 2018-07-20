@@ -29,7 +29,6 @@ int main(int argc, char** argv) {
     threshold = atof(argv[1]);
   } 
   
-  
   const long n = 1UL<<15; //rows
   const long m = 1UL<<15; //columns
   

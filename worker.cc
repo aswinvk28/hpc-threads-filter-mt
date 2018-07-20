@@ -190,21 +190,21 @@ void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frame
           #pragma omp section
           {
             for(int bor = 0; bor < frameParams->n_borrow; bor++) {
-              #pragma omp parallel for
+              #pragma omp parallel for firstprivate(frame)
               for(int ii = 0; ii < frameParams->num_vectors; ii++) {
                 #pragma omp simd
                 for(int pp = 0; pp < frameParams->num_codes; pp++) {
                   #pragma omp simd
                   for(int aa = 0; aa < frameParams->num_pointers; aa++) {
-                    frames[j]->_pointers[bor][ii][pp][aa] = &data[(((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
+                    frame->_pointers[bor][ii][pp][aa] = &data[(((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
                     (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frames[j]->__pointers[bor][ii][pp][aa] = 
+                    frame->__pointers[bor][ii][pp][aa] = 
                     &data[frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
                     (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frames[j]->_apointers[bor][ii][pp][aa] = 
+                    frame->_apointers[bor][ii][pp][aa] = 
                     &data[2*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
                     (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frames[j]->__apointers[bor][ii][pp][aa] = 
+                    frame->__apointers[bor][ii][pp][aa] = 
                     &data[3*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
                     (frameParams->num_product) + j*(frameParams->num_superindex)];
                   }
@@ -223,11 +223,12 @@ void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frame
  * breadth-first search
  * low performance tuning parameters as higher time to traverse through parallely
  */
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, long p, int frame_no, const long long m) 
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p, int frame_no, const long long m) 
 {
   #pragma omp parallel
   {
-    int p_index = p/frameParams->n_divide;
+    const int p_index = p/frameParams->n_divide;
+    #pragma omp for firstprivate(frame)
     for(int ii = 0; ii < frameParams->num_vectors; ii++) {
       float supersum1, supersum2, supersum3, supersum4 = 0.0f;
       #pragma omp simd reduction(+: supersum1, supersum2, supersum3, supersum4)
