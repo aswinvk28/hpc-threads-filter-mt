@@ -85,16 +85,16 @@ Frame::Frame(FrameParams * frameParams)
   setPointers(frameParams->num_vectors, frameParams->num_codes, frameParams->num_pointers, frameParams->n_borrow);
 }
 
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, long p, int frame_no, const long long m);
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, long p, int frame_no);
 void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frameParams);
 void calculate_row_sum(std::vector<Frame*> frames, FrameParams * frameParams);
 void calculate_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameParams);
 void calculate_next_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameParams);
 void calculate_next2_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameParams);
 void calculate_next3_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameParams);
-void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, int frame_no, const long long m);
-void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int frame_no, const long long m);
-void execute_section_wise_frames(vector<Frame*> frames, FrameParams * frameParams, const long long m);
+void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, int frame_no);
+void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int frame_no);
+void execute_section_wise_frames(vector<Frame*> frames, FrameParams * frameParams);
 
 void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
   
@@ -141,7 +141,7 @@ void filter(const long n, const long m, float *data, const float threshold, std:
 
   // execution (sum) of 18 members
   // sections created to test
-  execute_section_wise_frames(frames, frameParams, m*n);
+  execute_section_wise_frames(frames, frameParams);
 
   const double t4 = omp_get_wtime();
 
@@ -223,7 +223,7 @@ void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frame
  * breadth-first search
  * low performance tuning parameters as higher time to traverse through parallely
  */
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p, int frame_no, const long long m) 
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p, int frame_no) 
 {
   #pragma omp parallel
   {
@@ -394,180 +394,50 @@ void calculate_next3_odd_row_sum(std::vector<Frame*> frames, FrameParams * frame
 //   }
 // }
 
-void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, int frame_no, const long long m)
+void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, int frame_no)
 {
   for(int i = p; i < frameParams->num_subtasks + p; i++) {
     #pragma omp task
     {
-      calculate_vector_sum(frame, frameParams, i, frame_no, m);
+      calculate_vector_sum(frame, frameParams, i, frame_no);
     }
   }
 }
 
-void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int frame_no, const long long m)
+void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int frame_no)
 {
   #pragma omp single nowait
   {
     for(int i = 1; i <= frameParams->num_tasks; i++) {
       #pragma omp task
       {
-        execute_task_for_sum(frame, frameParams, (i-1)*frameParams->num_subtasks, frame_no, m);
+        execute_task_for_sum(frame, frameParams, (i-1)*frameParams->num_subtasks, frame_no);
       }
     }
   }
 }
 
-void execute_section_wise_frames(vector<Frame*> frames, FrameParams * frameParams, const long long m)
+void execute_task_wise_frames(vector<Frame*> frames, FrameParams * frameParams, int z)
+{
+  #pragma omp single
+  {
+    #pragma omp task
+    for(int i = (z-1)*frames.size()/(1<<4); i < z*frames.size()/(1<<4); i++) {
+      #pragma omp task
+      {
+        execute_section_for_frame(frames[i], frameParams, i);
+      }
+    }
+  }
+}
+
+void execute_section_wise_frames(vector<Frame*> frames, FrameParams * frameParams)
 {
   #pragma omp parallel
   {
-    #pragma omp sections nowait
-    {
-      #pragma omp section
-      {
-        for(int i = 0; i < frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = frames.size()/(1<<4); i < 2*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 2*frames.size()/(1<<4); i < 3*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 3*frames.size()/(1<<4); i < 4*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 4*frames.size()/(1<<4); i < 5*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 5*frames.size()/(1<<4); i < 6*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 6*frames.size()/(1<<4); i < 7*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 7*frames.size()/(1<<4); i < frames.size(); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-
-      #pragma omp section
-      {
-        for(int i = 8*frames.size()/(1<<4); i < 9*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 9*frames.size()/(1<<4); i < 10*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 10*frames.size()/(1<<4); i < 11*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 11*frames.size()/(1<<4); i < 12*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 12*frames.size()/(1<<4); i < 13*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 13*frames.size()/(1<<4); i < 14*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 14*frames.size()/(1<<4); i < 15*frames.size()/(1<<4); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
-      #pragma omp section
-      {
-        for(int i = 15*frames.size()/(1<<4); i < frames.size(); i++) {
-          #pragma omp task
-          {
-            execute_section_for_frame(frames[i], frameParams, i, m);
-          }
-        }
-      }
+    #pragma omp for
+    for(int z = 1; z <= (1<<4); z++) {
+      execute_task_wise_frames(frames, frameParams, z);
     }
   }
 }
