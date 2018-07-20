@@ -177,40 +177,29 @@ void append_vec(std::vector<long> &v1, std::vector<long> &v2) {
  */
 void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frameParams)
 {
-  #pragma omp parallel 
-  {
-    #pragma omp for nowait
-    for(int j = 0; j < frames.size(); j++) {
-      Frame * frame = new Frame(frameParams);
-      frames[j] = frame;
-      #pragma omp parallel
-      {
-        #pragma omp sections nowait
-        {
-          #pragma omp section
-          {
-            for(int bor = 0; bor < frameParams->n_borrow; bor++) {
-              #pragma omp parallel for firstprivate(frame)
-              for(int ii = 0; ii < frameParams->num_vectors; ii++) {
-                #pragma omp simd
-                for(int pp = 0; pp < frameParams->num_codes; pp++) {
-                  #pragma omp simd
-                  for(int aa = 0; aa < frameParams->num_pointers; aa++) {
-                    frame->_pointers[bor][ii][pp][aa] = &data[(((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
-                    (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frame->__pointers[bor][ii][pp][aa] = 
-                    &data[frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
-                    (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frame->_apointers[bor][ii][pp][aa] = 
-                    &data[2*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
-                    (frameParams->num_product) + j*(frameParams->num_superindex)];
-                    frame->__apointers[bor][ii][pp][aa] = 
-                    &data[3*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
-                    (frameParams->num_product) + j*(frameParams->num_superindex)];
-                  }
-                }
-              }
-            }
+  #pragma omp parallel for schedule(guided, 4)
+  for(int j = 0; j < frames.size(); j++) {
+    Frame * frame = new Frame(frameParams);
+    frames[j] = frame;
+    #pragma omp parallel for
+    for(int bor = 0; bor < frameParams->n_borrow; bor++) {
+      #pragma omp parallel for firstprivate(frame)
+      for(int ii = 0; ii < frameParams->num_vectors; ii++) {
+        #pragma omp simd
+        for(int pp = 0; pp < frameParams->num_codes; pp++) {
+          #pragma omp simd
+          for(int aa = 0; aa < frameParams->num_pointers; aa++) {
+            frame->_pointers[bor][ii][pp][aa] = &data[(((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
+            (frameParams->num_product) + j*(frameParams->num_superindex)];
+            frame->__pointers[bor][ii][pp][aa] = 
+            &data[frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
+            (frameParams->num_product) + j*(frameParams->num_superindex)];
+            frame->_apointers[bor][ii][pp][aa] = 
+            &data[2*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
+            (frameParams->num_product) + j*(frameParams->num_superindex)];
+            frame->__apointers[bor][ii][pp][aa] = 
+            &data[3*frameParams->num_index + (((bor*frameParams->num_vectors + ii)*(frameParams->num_codes)+pp)*frameParams->num_pointers + aa)*
+            (frameParams->num_product) + j*(frameParams->num_superindex)];
           }
         }
       }
@@ -223,7 +212,7 @@ void initialise_frames(vector<Frame*>& frames, float * data, FrameParams * frame
  * breadth-first search
  * low performance tuning parameters as higher time to traverse through parallely
  */
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p, int frame_no) 
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p, const int frame_no) 
 {
   #pragma omp parallel
   {
@@ -231,9 +220,13 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, const int p,
     #pragma omp for firstprivate(frame)
     for(int ii = 0; ii < frameParams->num_vectors; ii++) {
       float supersum1, supersum2, supersum3, supersum4 = 0.0f;
+      #pragma vector nontemporal
+      #pragma vector aligned
       #pragma omp simd reduction(+: supersum1, supersum2, supersum3, supersum4)
       for(int pp = 0; pp < frameParams->num_codes; pp++) {
         float sum1, sum2, sum3, sum4 = 0.0f;
+        #pragma vector nontemporal
+        #pragma vector aligned
         #pragma omp simd reduction(+: sum1, sum2, sum3, sum4)
         for(int aa = 0; aa < frameParams->num_pointers; aa++) {
           float intersum1, intersum2, intersum3, intersum4 = 0.0f;
@@ -275,7 +268,8 @@ void calculate_row_sum(std::vector<Frame*> frames, FrameParams * frameParams)
 {
   #pragma omp parallel for
   for(int a = 0; a < frames.size(); a++) {
-    #pragma omp parallel for
+    #pragma vector nontemporal
+    #pragma vector aligned
     for(int bor = 0; bor < frameParams->n_borrow; bor++) {
       #pragma ivdep
       #pragma vector nontemporal
@@ -298,7 +292,8 @@ void calculate_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameParams
 {
   #pragma omp parallel for
   for(int a = 0; a < frames.size(); a++) {
-    #pragma omp parallel for
+    #pragma vector nontemporal
+    #pragma vector aligned
     for(int bor = 0; bor < frameParams->n_borrow; bor++) {
       #pragma ivdep
       #pragma vector nontemporal
@@ -321,7 +316,8 @@ void calculate_next_odd_row_sum(std::vector<Frame*> frames, FrameParams * frameP
 {
   #pragma omp parallel for
   for(int a = 0; a < frames.size(); a++) {
-    #pragma omp parallel for
+    #pragma vector nontemporal
+    #pragma vector aligned
     for(int bor = 0; bor < frameParams->n_borrow; bor++) {
       #pragma ivdep
       #pragma vector nontemporal
@@ -344,7 +340,8 @@ void calculate_next2_odd_row_sum(std::vector<Frame*> frames, FrameParams * frame
 {
   #pragma omp parallel for
   for(int a = 0; a < frames.size(); a++) {
-    #pragma omp parallel for
+    #pragma vector nontemporal
+    #pragma vector aligned
     for(int bor = 0; bor < frameParams->n_borrow; bor++) {
       #pragma ivdep
       #pragma vector nontemporal
@@ -367,7 +364,8 @@ void calculate_next3_odd_row_sum(std::vector<Frame*> frames, FrameParams * frame
 {
   #pragma omp parallel for
   for(int a = 0; a < frames.size(); a++) {
-    #pragma omp parallel for
+    #pragma vector nontemporal
+    #pragma vector aligned
     for(int bor = 0; bor < frameParams->n_borrow; bor++) {
       #pragma ivdep
       #pragma vector nontemporal
@@ -394,17 +392,20 @@ void calculate_next3_odd_row_sum(std::vector<Frame*> frames, FrameParams * frame
 //   }
 // }
 
-void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, int frame_no)
+void execute_task_for_sum(Frame * frame, FrameParams * frameParams, int p, const int frame_no)
 {
-  for(int i = p; i < frameParams->num_subtasks + p; i++) {
-    #pragma omp task
-    {
-      calculate_vector_sum(frame, frameParams, i, frame_no);
+  #pragma omp single nowait
+  {
+    for(int i = p; i < frameParams->num_subtasks + p; i++) {
+      #pragma omp task
+      {
+        calculate_vector_sum(frame, frameParams, i, frame_no);
+      }
     }
   }
 }
 
-void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int frame_no)
+void execute_section_for_frame(Frame * frame, FrameParams * frameParams, const int frame_no)
 {
   #pragma omp single nowait
   {
@@ -417,11 +418,10 @@ void execute_section_for_frame(Frame * frame, FrameParams * frameParams, int fra
   }
 }
 
-void execute_task_wise_frames(vector<Frame*> frames, FrameParams * frameParams, int z)
+void execute_task_wise_frames(vector<Frame*> frames, FrameParams * frameParams, const int z)
 {
-  #pragma omp single
+  #pragma omp single nowait
   {
-    #pragma omp task
     for(int i = (z-1)*frames.size()/(1<<4); i < z*frames.size()/(1<<4); i++) {
       #pragma omp task
       {

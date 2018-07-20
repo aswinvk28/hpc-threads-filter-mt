@@ -1,5 +1,5 @@
 CXX=icl
-CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64
+CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64 /debug:full -Wall
 OPTRPT=-Qopt-report=5
 
 default : app
