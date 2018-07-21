@@ -91,7 +91,7 @@ void aggregate_result(vector<Frame*> frames, FrameParams * frameParams, const lo
 
 void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
   
-  int num_frames = 1<<5;
+  int num_frames = 1<<8;
   int num_vectors = 1<<5;
   int num_objects = 1<<2;
 
@@ -101,44 +101,44 @@ void filter(const long n, const long m, float *data, const float threshold, std:
   int num_tasks = 1<<6;
   int num_subtasks = 1<<2;
 
-  int n_borrow = 1<<3;
+  int n_borrow = 1<<0;
 
   // n = 1<<15, m = 1<<18, N = 1<<4, M = 1<<10, factor = 1<<4
   FrameParams * frameParams = new FrameParams
   (num_frames, num_vectors, num_codes, num_pointers, num_offset, num_tasks, num_subtasks, num_objects, n_borrow);
 
-  cout << "FrameParams: SubIndex: " << log2(frameParams->num_subindex) << "Index: " << log2(frameParams->num_index) << "SuperIndex: " << log2(frameParams->num_superindex) 
-  << "Product: " << log2(frameParams->num_product) << "Division: " << log2(frameParams->num_division) << "\n";
+  // cout << "FrameParams: SubIndex: " << log2(frameParams->num_subindex) << "Index: " << log2(frameParams->num_index) << "SuperIndex: " << log2(frameParams->num_superindex) 
+  // << "Product: " << log2(frameParams->num_product) << "Division: " << log2(frameParams->num_division) << "\n";
 
   vector<Frame*> frames(num_frames);
-  const double _t = omp_get_wtime();
+  // const double _t = omp_get_wtime();
   initialise_frames(frames, data, frameParams);
-  const double __t = omp_get_wtime();
-  printf("Initialise Time %f\t", __t - _t);
+  // const double __t = omp_get_wtime();
+  // printf("Initialise Time %f\t", __t - _t);
 
-  std::vector<float> total0(0); 
-  std::vector<float> total1(0); std::vector<float> total2(0); 
-  std::vector<float> total3(0); std::vector<float> total4(0);
-  std::vector<float> total5(0); std::vector<float> total6(0);
-  std::vector<float> total7(0); std::vector<float> total8(0); 
-  std::vector<float> total9(0); 
-  std::vector<float> total10(0); std::vector<float> total11(0);
-  std::vector<float> total12(0); std::vector<float> total13(0);
-  std::vector<float> total14(0); std::vector<float> total15(0);
+  // std::vector<float> total0(0); 
+  // std::vector<float> total1(0); std::vector<float> total2(0); 
+  // std::vector<float> total3(0); std::vector<float> total4(0);
+  // std::vector<float> total5(0); std::vector<float> total6(0);
+  // std::vector<float> total7(0); std::vector<float> total8(0); 
+  // std::vector<float> total9(0); 
+  // std::vector<float> total10(0); std::vector<float> total11(0);
+  // std::vector<float> total12(0); std::vector<float> total13(0);
+  // std::vector<float> total14(0); std::vector<float> total15(0);
 
-  std::vector<float> total[16] = {
-    total0, total1, total2, total3, total4, total5, total6, total7,
-    total8, total9, total10, total11, total12, total13, total14, total15};
+  // std::vector<float> total[16] = {
+  //   total0, total1, total2, total3, total4, total5, total6, total7,
+  //   total8, total9, total10, total11, total12, total13, total14, total15};
   
-  const double t3 = omp_get_wtime();
+  // const double t3 = omp_get_wtime();
 
   // execution (sum) of 18 members
   // sections created to test
   execute_section_wise_frames(frames, frameParams, data);
 
-  const double t4 = omp_get_wtime();
+  // const double t4 = omp_get_wtime();
 
-  printf("Task Time: %f\t", t4-t3);
+  // printf("Task Time: %f\t", t4-t3);
 
   #pragma omp taskwait
   {
@@ -148,8 +148,8 @@ void filter(const long n, const long m, float *data, const float threshold, std:
     // calculate_next2_odd_row_sum(frames, frameParams);
     // calculate_next3_odd_row_sum(frames, frameParams);
     aggregate_result(frames, frameParams, n, m, threshold, result_row_ind);
-    const double t5 = omp_get_wtime();
-    printf("Task Time: %f\t", t5-t4);
+    // const double t5 = omp_get_wtime();
+    // printf("Task Time: %f\t", t5-t4);
   }
 
   //sort the values stored in the vector
