@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <omp.h>
-#include <mkl.h>
 #include <cmath>
 
 using namespace std;
@@ -61,7 +60,6 @@ public:
   vector<float> __pointers;
   vector<float> _apointers;
   vector<float> __apointers;
-  vector<vector<float>> sum;
   void setPointers(int num_vectors, int num_codes, int num_pointers, int n_borrow);
   Frame(FrameParams * frameParams);
 };
@@ -91,39 +89,20 @@ void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float *
 void execute_section_wise_frames(vector<Frame*> frames, FrameParams * frameParams, float * data);
 void aggregate_result(vector<Frame*> frames, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind);
 
-void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv) {
+void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
   
-  int _n_shift = atoi(argv[2]);
-  int _m_shift = atoi(argv[3]);
-  int frames_shift = atoi(argv[4]);
-  int vector_shift = atoi(argv[5]);
-  int code_shift = atoi(argv[6]);
-  int pointer_shift = atoi(argv[7]);
-  int offset_shift = atoi(argv[8]);
-  int task_shift = atoi(argv[9]);
-  int subtask_shift = atoi(argv[10]);
-  int borrow_shift = atoi(argv[11]);
-  
-  int num_frames = 1<<frames_shift;
-  int num_vectors = 1<<vector_shift;
+  int num_frames = 1<<5;
+  int num_vectors = 1<<5;
   int num_objects = 1<<2;
 
-  int num_codes = 1<<code_shift;
-  int num_pointers = 1<<pointer_shift;
-  int num_offset = 1<<offset_shift;
-  int num_tasks = 1<<task_shift;
-  int num_subtasks = 1<<subtask_shift;
+  int num_codes = 1<<3;
+  int num_pointers = 1<<3;
+  int num_offset = 1<<6;
+  int num_tasks = 1<<6;
+  int num_subtasks = 1<<2;
 
-  int n_borrow = 1<<borrow_shift;
+  int n_borrow = 1<<3;
 
-  long _n = 1<<_n_shift;
-  long _m = 1<<_m_shift;
-  
-  // long random_seed = (long)(omp_get_wtime()*1000.0) % 1000L;
-  // VSLStreamStatePtr rnStream;
-  // vslNewStream( &rnStream, VSL_BRNG_MT19937, random_seed);
-  // vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, _m*_n, &data[0], -1.0, 1.0);
-  
   // n = 1<<15, m = 1<<18, N = 1<<4, M = 1<<10, factor = 1<<4
   FrameParams * frameParams = new FrameParams
   (num_frames, num_vectors, num_codes, num_pointers, num_offset, num_tasks, num_subtasks, num_objects, n_borrow);
@@ -172,8 +151,6 @@ void filter(const long n, const long m, float *data, const float threshold, std:
     const double t5 = omp_get_wtime();
     printf("Task Time: %f\t", t5-t4);
   }
-
-  printf("Result size: %d\t", result_row_ind.size());
 
   //sort the values stored in the vector
   std::sort(result_row_ind.begin(),
@@ -287,8 +264,6 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data
     }
   }
 }
-
-
 
 /**
  * trawl for n (nouns)
