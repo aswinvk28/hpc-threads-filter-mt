@@ -1,5 +1,5 @@
 CXX=icl
-CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64 /debug:full
+CXXFLAGS=-QaxMIC-AVX512 -Qopenmp -Qmkl -Qstd=c++11 -Qm64 /debug:full -lmemkind
 OPTRPT=-Qopt-report=5
 
 default : app
@@ -13,7 +13,7 @@ app : main.cc worker.o
 
 queue: app
 
-	TIMEIT -m 0x1 app.exe
+	# TIMEIT -m 0x1 app.exe
 
 clean :
 	rm app.exe worker.obj *.optrpt
