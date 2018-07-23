@@ -107,14 +107,14 @@ void call_filter(const long n, const long m, float *data, const float threshold,
 {
   // int _n_shift = atoi(argv[2]);
   // int _m_shift = atoi(argv[3]);
-  int frames_shift = 4;
+  int frames_shift = 2;
   int vector_shift = 4;
   int code_shift = 3;
   int pointer_shift = 2;
-  int offset_shift = 11;
+  int offset_shift = 10;
   int task_shift = 5;
   int subtask_shift = 5;
-  int borrow_shift = 5;
+  int borrow_shift = 7;
   
   int num_frames = 1<<frames_shift;
   int num_vectors = 1<<vector_shift;
