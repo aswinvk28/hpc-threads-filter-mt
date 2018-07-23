@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv);
+void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind/*, int argc, char** argv*/);
 
 //reference function to verify data
 void filter_ref(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
   //compute actual data using the function defined in worker.cc and get the timing
   std::vector<long> result_row_ind; 
   const double t0 = omp_get_wtime();
-  filter(_n, _m, data, threshold, result_row_ind, argc, argv);
+  filter(_n, _m, data, threshold, result_row_ind/*, argc, argv*/);
   const double t1 = omp_get_wtime();
   
   //verify the actual data and the refernce data
