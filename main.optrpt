@@ -32,30 +32,37 @@ Begin optimization report for: main(int, char **)
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (main(int, char **)) [1/106=0.9%] main.cc(26,33)
+INLINE REPORT: (main(int, char **)) [1/105=1.0%] main.cc(26,33)
   -> INLINE (MANUAL): (32,17) atof(const char *) (isz = 5) (sz = 12)
     -> EXTERN: /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:(28,10) strtod(const char *, char **)
-  -> INLINE (MANUAL): (35,18) atoi(const char *) (isz = 7) (sz = 14)
-    -> EXTERN: /usr/include/stdlib.h:(280,16) strtol(const char *, char **, int)
-  -> INLINE (MANUAL): (36,18) atoi(const char *) (isz = 7) (sz = 14)
-    -> EXTERN: /usr/include/stdlib.h:(280,16) strtol(const char *, char **, int)
-  -> EXTERN: (44,27) malloc(size_t)
-  -> EXTERN: (45,29) omp_get_wtime()
-  -> EXTERN: (47,3) vslNewStream(VSLStreamStatePtr *, int, unsigned int)
-  -> (58,21) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
+  -> EXTERN: (38,27) malloc(size_t)
+  -> EXTERN: (39,29) omp_get_wtime()
+  -> EXTERN: (41,3) vslNewStream(VSLStreamStatePtr *, int, unsigned int)
+  -> (48,21) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
      [[ Callee not marked with inlining pragma  <1>]]
-  -> (58,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 18) (sz = 23)
+  -> (48,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 18) (sz = 23)
      [[ Called routine is noinline  <2>]]
-  -> (60,3) filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &) (isz = 1813) (sz = 1826)
+  -> (50,3) filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &) (isz = 1813) (sz = 1826)
      [[ Inlining would exceed -inline-max-size value (1826>253) <3>]]
-  -> (63,21) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
+  -> (53,21) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
      [[ Callee not marked with inlining pragma  <1>]]
-  -> (63,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 18) (sz = 23)
+  -> (53,21) std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *) (isz = 18) (sz = 23)
      [[ Called routine is noinline  <2>]]
-  -> EXTERN: (64,21) omp_get_wtime()
-  -> EXTERN: (65,3) filter(long, long, float *, float, std::vector<long, std::allocator<long>> &, int, char **)
-  -> EXTERN: (66,21) omp_get_wtime()
-  -> INLINE (MANUAL): (69,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
+  -> EXTERN: (54,21) omp_get_wtime()
+  -> EXTERN: (55,3) filter(long, long, float *, float, std::vector<long, std::allocator<long>> &)
+  -> EXTERN: (56,21) omp_get_wtime()
+  -> INLINE (MANUAL): (59,25) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> INLINE (MANUAL): (59,50) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> EXTERN: (61,5) printf(const char *, ...)
+  -> INLINE (MANUAL): (61,103) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> INLINE (MANUAL): (61,126) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> INLINE (MANUAL): (64,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> INLINE (MANUAL): (64,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
+  -> INLINE (MANUAL): (65,36) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 1) (sz = 10)
+  -> INLINE (MANUAL): (65,57) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 1) (sz = 10)
+  -> EXTERN: (69,7) printf(const char *, ...)
+  -> EXTERN: (72,7) printf(const char *, ...)
+  -> INLINE (MANUAL): (75,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(424,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *const) (isz = 18) (sz = 23)
       -> (159,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *) (isz = 18) (sz = 23)
          [[ Callee not marked with inlining pragma  <1>]]
@@ -69,7 +76,7 @@ INLINE REPORT: (main(int, char **)) [1/106=0.9%] main.cc(26,33)
           -> INLINE (MANUAL): (178,4) std::allocator_traits<std::allocator<long>>::deallocate(std::allocator_traits<std::allocator<long>>::allocator_type &, std::allocator_traits<std::allocator<long>>::pointer, std::allocator_traits<std::allocator<long>>::size_type) (isz = 0) (sz = 9)
             -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(517,13) __gnu_cxx::new_allocator<long>::deallocate(__gnu_cxx::new_allocator<long> *, __gnu_cxx::new_allocator<long>::pointer, __gnu_cxx::new_allocator<long>::size_type) (isz = 0) (sz = 7)
               -> EXTERN: /usr/include/c++/5.4.0/ext/new_allocator.h:(110,9) operator delete(void *)
-  -> INLINE (MANUAL): (69,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
+  -> INLINE (MANUAL): (75,3) std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *) (isz = 40) (sz = 45)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(424,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *const) (isz = 18) (sz = 23)
       -> (159,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *) (isz = 18) (sz = 23)
          [[ Callee not marked with inlining pragma  <1>]]
@@ -83,30 +90,20 @@ INLINE REPORT: (main(int, char **)) [1/106=0.9%] main.cc(26,33)
           -> INLINE (MANUAL): (178,4) std::allocator_traits<std::allocator<long>>::deallocate(std::allocator_traits<std::allocator<long>>::allocator_type &, std::allocator_traits<std::allocator<long>>::pointer, std::allocator_traits<std::allocator<long>>::size_type) (isz = 0) (sz = 9)
             -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(517,13) __gnu_cxx::new_allocator<long>::deallocate(__gnu_cxx::new_allocator<long> *, __gnu_cxx::new_allocator<long>::pointer, __gnu_cxx::new_allocator<long>::size_type) (isz = 0) (sz = 7)
               -> EXTERN: /usr/include/c++/5.4.0/ext/new_allocator.h:(110,9) operator delete(void *)
-  -> INLINE (MANUAL): (69,25) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> INLINE (MANUAL): (69,50) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> EXTERN: (71,5) printf(const char *, ...)
-  -> INLINE (MANUAL): (71,103) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> INLINE (MANUAL): (71,126) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> INLINE (MANUAL): (74,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> INLINE (MANUAL): (74,44) std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const (isz = 5) (sz = 12)
-  -> INLINE (MANUAL): (75,36) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 1) (sz = 10)
-  -> INLINE (MANUAL): (75,57) std::vector<long, std::allocator<long>>::operator[](std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type) (isz = 1) (sz = 10)
-  -> EXTERN: (79,7) printf(const char *, ...)
-  -> EXTERN: (82,7) printf(const char *, ...)
+  -> EXTERN: (75,3) free(void *)
 
 
     Report from: Loop nest, Vector & Auto-parallelization optimizations [loop, vec, par]
 
 
-LOOP BEGIN at main.cc(74,44)
+LOOP BEGIN at main.cc(64,44)
    remark #15344: loop was not vectorized: vector dependence prevents vectorization
-   remark #15346: vector dependence: assumed ANTI dependence between passed (75:7) and passed (75:7)
-   remark #15346: vector dependence: assumed FLOW dependence between passed (75:7) and passed (75:7)
+   remark #15346: vector dependence: assumed ANTI dependence between passed (65:7) and passed (65:7)
+   remark #15346: vector dependence: assumed FLOW dependence between passed (65:7) and passed (65:7)
    remark #25439: unrolled with remainder by 2  
 LOOP END
 
-LOOP BEGIN at main.cc(74,44)
+LOOP BEGIN at main.cc(64,44)
 <Remainder>
 LOOP END
 
@@ -118,22 +115,22 @@ main.cc(26,33):remark #34051: REGISTER ALLOCATION : [main] main.cc:26
         Reserved     :    2[ rsp rip]
         Available    :   39[ rax rdx rcx rbx rbp rsi rdi r8-r15 mm0-mm7 zmm0-zmm15]
         Callee-save  :    6[ rbx rbp r12-r15]
-        Assigned     :   16[ rax rdx rcx rbx rsi rdi r8-r15 zmm0-zmm1]
+        Assigned     :   14[ rax rdx rcx rbx rsi rdi r8-r11 r14-r15 zmm0-zmm1]
         
     Routine temporaries
-        Total         :     145
-            Global    :      39
-            Local     :     106
-        Regenerable   :      39
-        Spilled       :       7
+        Total         :     126
+            Global    :      32
+            Local     :      94
+        Regenerable   :      44
+        Spilled       :       5
         
     Routine stack
         Variables     :      68 bytes*
-            Reads     :       8 [4.28e+00 ~ 2.9%]
+            Reads     :       8 [4.28e+00 ~ 3.2%]
             Writes    :       4 [0.00e+00 ~ 0.0%]
         Spills        :      16 bytes*
-            Reads     :       3 [2.39e+00 ~ 1.6%]
-            Writes    :       3 [2.50e+00 ~ 1.7%]
+            Reads     :       3 [2.39e+00 ~ 1.8%]
+            Writes    :       3 [2.50e+00 ~ 1.9%]
     
     Notes
     
@@ -147,7 +144,7 @@ Begin optimization report for: std::_Vector_base<long, std::allocator<long>>::~_
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *)) [2/106=1.9%] /usr/include/c++/5.4.0/bits/stl_vector.h(160,7)
+INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *)) [2/105=1.9%] /usr/include/c++/5.4.0/bits/stl_vector.h(160,7)
   -> EXTERN: (160,7) __cxa_call_unexpected
   -> INLINE (MANUAL): (160,9) std::_Vector_base<long, std::allocator<long>>::_M_deallocate(std::_Vector_base<long, std::allocator<long>> *, std::_Vector_base<long, std::allocator<long>>::pointer, std::size_t) (isz = 4) (sz = 13)
     -> INLINE (MANUAL): (178,4) std::allocator_traits<std::allocator<long>>::deallocate(std::allocator_traits<std::allocator<long>>::allocator_type &, std::allocator_traits<std::allocator<long>>::pointer, std::allocator_traits<std::allocator<long>>::size_type) (isz = 0) (sz = 9)
@@ -200,7 +197,7 @@ Begin optimization report for: std::vector<long, std::allocator<long>>::~vector(
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *)) [4/106=3.8%] /usr/include/c++/5.4.0/bits/stl_vector.h(424,7)
+INLINE REPORT: (std::vector<long, std::allocator<long>>::~vector(std::vector<long, std::allocator<long>> *)) [4/105=3.8%] /usr/include/c++/5.4.0/bits/stl_vector.h(424,7)
   -> EXTERN: (424,7) __cxa_call_unexpected
   -> INLINE (MANUAL): (424,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *const) (isz = 18) (sz = 23)
     -> (159,7) std::_Vector_base<long, std::allocator<long>>::~_Vector_base(std::_Vector_base<long, std::allocator<long>> *) (isz = 18) (sz = 23)
@@ -253,7 +250,7 @@ Begin optimization report for: filter_ref(long, long, float *, float, std::vecto
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/106=4.7%] main.cc(13,116)
+INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/105=4.8%] main.cc(13,116)
   -> INLINE (MANUAL): (21,22) std::vector<long, std::allocator<long>>::push_back(std::vector<long, std::allocator<long>> *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 335) (sz = 342)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(917,6) std::allocator_traits<std::allocator<long>>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(std::allocator_traits<std::allocator<long>>::allocator_type &, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 18) (sz = 27)
       -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(530,8) __gnu_cxx::new_allocator<long>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(__gnu_cxx::new_allocator<long> *, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 15) (sz = 24)
@@ -720,7 +717,7 @@ Begin optimization report for: filter_ref(long, long, float *, float, std::vecto
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/106=4.7%] main.cc(13,116)
+INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/105=4.8%] main.cc(13,116)
   -> INLINE (MANUAL): (21,22) std::vector<long, std::allocator<long>>::push_back(std::vector<long, std::allocator<long>> *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 335) (sz = 342)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(917,6) std::allocator_traits<std::allocator<long>>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(std::allocator_traits<std::allocator<long>>::allocator_type &, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 18) (sz = 27)
       -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(530,8) __gnu_cxx::new_allocator<long>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(__gnu_cxx::new_allocator<long> *, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 15) (sz = 24)
@@ -1196,7 +1193,7 @@ Begin optimization report for: filter_ref(long, long, float *, float, std::vecto
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/106=4.7%] main.cc(13,116)
+INLINE REPORT: (filter_ref(long, long, float *, float, std::vector<long, std::allocator<long>> &)) [5/105=4.8%] main.cc(13,116)
   -> INLINE (MANUAL): (21,22) std::vector<long, std::allocator<long>>::push_back(std::vector<long, std::allocator<long>> *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 335) (sz = 342)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(917,6) std::allocator_traits<std::allocator<long>>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(std::allocator_traits<std::allocator<long>>::allocator_type &, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 18) (sz = 27)
       -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(530,8) __gnu_cxx::new_allocator<long>::construct<long, const std::vector<long, std::allocator<long>>::value_type &>(__gnu_cxx::new_allocator<long> *, long *, const std::vector<long, std::allocator<long>>::value_type &) (isz = 15) (sz = 24)
@@ -1662,7 +1659,7 @@ Begin optimization report for: std::vector<long, std::allocator<long>>::_M_empla
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::vector<long, std::allocator<long>>::_M_emplace_back_aux<const std::vector<long, std::allocator<long>>::value_type &>(std::vector<long, std::allocator<long>> *, const std::vector<long, std::allocator<long>>::value_type &)) [6/106=5.7%] /usr/include/c++/5.4.0/bits/vector.tcc(409,7)
+INLINE REPORT: (std::vector<long, std::allocator<long>>::_M_emplace_back_aux<const std::vector<long, std::allocator<long>>::value_type &>(std::vector<long, std::allocator<long>> *, const std::vector<long, std::allocator<long>>::value_type &)) [6/105=5.7%] /usr/include/c++/5.4.0/bits/vector.tcc(409,7)
   -> INLINE (MANUAL): (411,4) std::vector<long, std::allocator<long>>::_M_check_len(const std::vector<long, std::allocator<long>> *, std::vector<long, std::allocator<long>>::size_type, const char *) const (isz = 100) (sz = 111)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_vector.h:(1424,6) std::vector<long, std::allocator<long>>::max_size(const std::vector<long, std::allocator<long>> *) const (isz = 12) (sz = 19)
       -> INLINE (MANUAL): (660,16) std::allocator_traits<std::allocator<long>>::max_size(const std::allocator_traits<std::allocator<long>>::allocator_type &) (isz = 4) (sz = 11)
@@ -1788,7 +1785,7 @@ Begin optimization report for: std::vector<long, std::allocator<long>>::size(con
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const) [8/106=7.5%] /usr/include/c++/5.4.0/bits/stl_vector.h(655,7)
+INLINE REPORT: (std::vector<long, std::allocator<long>>::size(const std::vector<long, std::allocator<long>> *) const) [8/105=7.6%] /usr/include/c++/5.4.0/bits/stl_vector.h(655,7)
 
 
     Report from: Code generation optimizations [cg]
@@ -1828,7 +1825,7 @@ Begin optimization report for: std::_Vector_base<long, std::allocator<long>>::_M
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::_M_get_Tp_allocator(std::_Vector_base<long, std::allocator<long>> *)) [9/106=8.5%] /usr/include/c++/5.4.0/bits/stl_vector.h(114,7)
+INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::_M_get_Tp_allocator(std::_Vector_base<long, std::allocator<long>> *)) [9/105=8.6%] /usr/include/c++/5.4.0/bits/stl_vector.h(114,7)
 
 
     Report from: Code generation optimizations [cg]
@@ -1868,7 +1865,7 @@ Begin optimization report for: std::_Vector_base<long, std::allocator<long>>::_M
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::_M_deallocate(std::_Vector_base<long, std::allocator<long>> *, std::_Vector_base<long, std::allocator<long>>::pointer, std::size_t)) [10/106=9.4%] /usr/include/c++/5.4.0/bits/stl_vector.h(175,7)
+INLINE REPORT: (std::_Vector_base<long, std::allocator<long>>::_M_deallocate(std::_Vector_base<long, std::allocator<long>> *, std::_Vector_base<long, std::allocator<long>>::pointer, std::size_t)) [10/105=9.5%] /usr/include/c++/5.4.0/bits/stl_vector.h(175,7)
   -> INLINE (MANUAL): (178,4) std::allocator_traits<std::allocator<long>>::deallocate(std::allocator_traits<std::allocator<long>>::allocator_type &, std::allocator_traits<std::allocator<long>>::pointer, std::allocator_traits<std::allocator<long>>::size_type) (isz = 0) (sz = 9)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/alloc_traits.h:(517,13) __gnu_cxx::new_allocator<long>::deallocate(__gnu_cxx::new_allocator<long> *, __gnu_cxx::new_allocator<long>::pointer, __gnu_cxx::new_allocator<long>::size_type) (isz = 0) (sz = 7)
       -> EXTERN: /usr/include/c++/5.4.0/ext/new_allocator.h:(110,9) operator delete(void *)
@@ -1919,7 +1916,7 @@ Begin optimization report for: std::__adjust_heap<std::vector<long, std::allocat
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::__adjust_heap<std::vector<long, std::allocator<long>>::iterator, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::remove_reference<std::move_iterator<std::_Vector_base<long, std::allocator<long>>::pointer>::__base_ref>::type, __gnu_cxx::__ops::_Iter_less_iter>(std::vector<long, std::allocator<long>>::iterator, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::remove_reference<std::move_iterator<std::_Vector_base<long, std::allocator<long>>::pointer>::__base_ref>::type, __gnu_cxx::__ops::_Iter_less_iter)) [12/106=11.3%] /usr/include/c++/5.4.0/bits/stl_heap.h(209,5)
+INLINE REPORT: (std::__adjust_heap<std::vector<long, std::allocator<long>>::iterator, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::remove_reference<std::move_iterator<std::_Vector_base<long, std::allocator<long>>::pointer>::__base_ref>::type, __gnu_cxx::__ops::_Iter_less_iter>(std::vector<long, std::allocator<long>>::iterator, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::__iterator_traits<std::vector<long, std::allocator<long>>::iterator, std::__void_t<>>::difference_type, std::remove_reference<std::move_iterator<std::_Vector_base<long, std::allocator<long>>::pointer>::__base_ref>::type, __gnu_cxx::__ops::_Iter_less_iter)) [12/105=11.4%] /usr/include/c++/5.4.0/bits/stl_heap.h(209,5)
   -> INLINE (MANUAL): (215,14) __gnu_cxx::__ops::_Iter_less_iter::operator()<__gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>, __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>>(const __gnu_cxx::__ops::_Iter_less_iter *, __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>, __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>) const (isz = 8) (sz = 19)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/predefined_ops.h:(43,16) __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>::operator*(const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> *) const (isz = 0) (sz = 7)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/predefined_ops.h:(43,25) __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>::operator*(const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> *) const (isz = 0) (sz = 7)
@@ -2013,7 +2010,7 @@ Begin optimization report for: std::__introsort_loop<std::vector<long, std::allo
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::__introsort_loop<std::vector<long, std::allocator<long>>::iterator, long, __gnu_cxx::__ops::_Iter_less_iter>(std::vector<long, std::allocator<long>>::iterator, std::vector<long, std::allocator<long>>::iterator, long, __gnu_cxx::__ops::_Iter_less_iter)) [13/106=12.3%] /usr/include/c++/5.4.0/bits/stl_algo.h(1938,5)
+INLINE REPORT: (std::__introsort_loop<std::vector<long, std::allocator<long>>::iterator, long, __gnu_cxx::__ops::_Iter_less_iter>(std::vector<long, std::allocator<long>>::iterator, std::vector<long, std::allocator<long>>::iterator, long, __gnu_cxx::__ops::_Iter_less_iter)) [13/105=12.4%] /usr/include/c++/5.4.0/bits/stl_algo.h(1938,5)
   -> INLINE (MANUAL): (1939,21) __gnu_cxx::operator-<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>(const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> &, const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> &) (isz = 13) (sz = 22)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_iterator.h:(926,20) __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>::base(const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> *) const (isz = 1) (sz = 7)
     -> INLINE (MANUAL): /usr/include/c++/5.4.0/bits/stl_iterator.h:(926,35) __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>>::base(const __gnu_cxx::__normal_iterator<std::vector<long, std::allocator<long>>::pointer, std::vector<long, std::allocator<long>>> *) const (isz = 1) (sz = 7)
@@ -2378,7 +2375,7 @@ Begin optimization report for: std::vector<long, std::allocator<long>>::vector(s
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *)) [14/106=13.2%] /usr/include/c++/5.4.0/bits/stl_vector.h(257,17)
+INLINE REPORT: (std::vector<long, std::allocator<long>>::vector(std::vector<long, std::allocator<long>> *)) [14/105=13.3%] /usr/include/c++/5.4.0/bits/stl_vector.h(257,17)
   -> INLINE (MANUAL): (253,7) std::_Vector_base<long, std::allocator<long>>::_Vector_base(std::_Vector_base<long, std::allocator<long>> *const) (isz = 13) (sz = 18)
     -> INLINE (MANUAL): (124,7) std::_Vector_base<long, std::allocator<long>>::_Vector_base(std::_Vector_base<long, std::allocator<long>> *) (isz = 13) (sz = 18)
       -> INLINE (MANUAL): (124,7) std::_Vector_base<long, std::allocator<long>>::_Vector_impl::_Vector_impl(std::_Vector_base<long, std::allocator<long>>::_Vector_impl *) (isz = 11) (sz = 16)
@@ -3106,7 +3103,7 @@ Begin optimization report for: __sti__$E()
 
     Report from: Interprocedural optimizations [ipo]
 
-INLINE REPORT: (__sti__$E()) [102/106=96.2%] <compiler generated>
+INLINE REPORT: (__sti__$E()) [101/105=96.2%] <compiler generated>
   -> EXTERN: /usr/include/c++/5.4.0/iostream:(74,25) __cxa_atexit(void (*)(void *), void *, void *)
   -> EXTERN: /usr/include/c++/5.4.0/iostream:(74,25) std::ios_base::Init::Init(std::ios_base::Init *)
 

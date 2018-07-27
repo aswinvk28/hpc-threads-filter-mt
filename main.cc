@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sys/types.h>
 
-void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv);
+void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind);
 
 //reference function to verify data
 void filter_ref(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
@@ -32,23 +32,13 @@ int main(int argc, char** argv) {
     threshold = atof(argv[1]);
   } 
 
-  int _n_shift = atoi(argv[2]);
-  int _m_shift = atoi(argv[3]);
-
-  long _n = 1<<_n_shift;
-  long _m = 1<<_m_shift;
+  const long n = 1<<15; //rows
+  const long m = 1<<18; //columns
   
-  // const long n = 1UL<<10; //rows
-  // const long m = 1UL<<10; //columns
-  
-  float *data = (float *) malloc((long long)sizeof(float)*_n*_m);
+  float *data = (float *) malloc((long long)sizeof(float)*m*n);
   long random_seed = (long)(omp_get_wtime()*1000.0) % 1000L;
   VSLStreamStatePtr rnStream;
   vslNewStream( &rnStream, VSL_BRNG_MT19937, random_seed);
-  // vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, _m*_n, &data[0], -1.0, 1.0);
-
-  // std::cout << data[0] << data[1] << data[122] << std::endl;
-  // exit(0);
 
   //initialize 2D data
 // #pragma omp parallel for 
@@ -57,12 +47,12 @@ int main(int argc, char** argv) {
 
   std::vector<long> ref_result_row_ind; 
   //compute the refernce data using unoptimized refernce function defined above
-  filter_ref(_n, _m, data, threshold, ref_result_row_ind);
+  filter_ref(n, m, data, threshold, ref_result_row_ind);
   
   //compute actual data using the function defined in worker.cc and get the timing
   std::vector<long> result_row_ind; 
   const double t0 = omp_get_wtime();
-  filter(_n, _m, data, threshold, result_row_ind, argc, argv);
+  filter(n, m, data, threshold, result_row_ind);
   const double t1 = omp_get_wtime();
   
   //verify the actual data and the refernce data
@@ -82,5 +72,5 @@ int main(int argc, char** argv) {
       printf("Error: The reference and result vectors did not match");
     }
   }
-  // free(data);
+  free(data);
 }

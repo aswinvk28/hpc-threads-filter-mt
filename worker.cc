@@ -12,7 +12,6 @@
 using namespace std;
 
 /**
- * breadth
  * (1<<8) section offsets, (1<<4) task offsets, (1<<4) offsets, (1<<2) pointers, 4 sum offsets
  */
 struct FrameParams
@@ -56,7 +55,6 @@ struct FrameParams
 };
 
 /**
- * depth
  * (1<<4) objects, (1<<6) vectors, (1<<5) frames = (1<<15) n
  */
 class Frame
@@ -106,100 +104,45 @@ void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data
 void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, int frame_no);
 void execute_section_wise_frames(Frame* frame, FrameParams * frameParams, float * data);
 void aggregate_result(Frame* frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind);
-void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv);
+void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind);
 
-void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv)
+void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind)
 {
-  // int _n_shift = atoi(argv[2]);
-  // int _m_shift = atoi(argv[3]);
-  // int frames_shift = 2;
-  // int vector_shift = 4;
-  // int code_shift = 3;
-  // int pointer_shift = 2;
-  // int offset_shift = 10;
-  // int task_shift = 5;
-  // int subtask_shift = 5;
-  // int borrow_shift = 7;
-
-  int frames_shift = atoi(argv[4]);
-  int vector_shift = atoi(argv[5]);
-  int code_shift = atoi(argv[6]);
-  int pointer_shift = atoi(argv[7]);
-  int offset_shift = atoi(argv[8]);
-  int task_shift = atoi(argv[9]);
-  int subtask_shift = atoi(argv[10]);
-  int borrow_shift = atoi(argv[11]);
-  int thread_shift = atoi(argv[12]);
-  
-  int num_frames = 1<<frames_shift;
-  int num_vectors = 1<<vector_shift;
+  int num_frames = 1<<4;
+  int num_vectors = 1<<3;
   int num_objects = 1<<2;
 
-  int num_codes = 1<<code_shift;
-  int num_pointers = 1<<pointer_shift;
-  int num_offset = 1<<offset_shift;
-  int num_tasks = 1<<task_shift;
-  int num_subtasks = 1<<subtask_shift;
+  int num_codes = 1<<2;
+  int num_pointers = 1<<4;
+  int num_offset = 1<<12;
+  int num_tasks = 1<<4;
+  int num_subtasks = 1<<4;
 
-  int n_borrow = 1<<borrow_shift;
+  int n_borrow = 1<<6;
 
-  int n_threads = 1<<thread_shift;
+  int n_threads = 1<<3;
 
-  // long _n = 1<<_n_shift;
-  // long _m = 1<<_m_shift;
-  
-  // long random_seed = (long)(omp_get_wtime()*1000.0) % 1000L;
-  // VSLStreamStatePtr rnStream;
-  // vslNewStream( &rnStream, VSL_BRNG_MT19937, random_seed);
-  // vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, _m*_n, &data[0], -1.0, 1.0);
-  
-  // n = 1<<15, m = 1<<18, N = 1<<4, M = 1<<10, factor = 1<<4
   FrameParams * frameParams = new FrameParams
   (num_frames, num_vectors, num_codes, num_pointers, num_offset, num_tasks, num_subtasks, num_objects, n_borrow, n_threads);
 
-  cout << "FrameParams: SubIndex: " << log2(frameParams->num_subindex) << "Index: " << log2(frameParams->num_index) << "SuperIndex: " << log2(frameParams->num_superindex) 
-  << "Product: " << log2(frameParams->num_product) << "Division: " << log2(frameParams->num_division) << "\n";
-
   Frame * frame = new Frame(frameParams);
-  const double _t = omp_get_wtime();
   initialise_frames(frame, data, frameParams);
-  const double __t = omp_get_wtime();
-  printf("Initialise Time %f\t", __t - _t);
   
-  const double t3 = omp_get_wtime();
-
   // execution (sum) of 18 members
-  // sections created to test
   execute_section_wise_frames(frame, frameParams, data);
-
-  const double t4 = omp_get_wtime();
-
-  printf("Task Time: %f\t", t4-t3);
 
   #pragma omp taskwait
   {
-    // calculate_row_sum(frame, frameParams);
-    // calculate_odd_row_sum(frame, frameParams);
-    // const double t5 = omp_get_wtime();
-    // printf("simd breadth sum Time: %f\t", t5-t4);
-    // calculate_next_odd_row_sum(frames, frameParams);
-    // calculate_next2_odd_row_sum(frames, frameParams);
-    // calculate_next3_odd_row_sum(frames, frameParams);
     aggregate_result(frame, frameParams, n, m, threshold, result_row_ind);
-    const double t6 = omp_get_wtime();
-    printf("aggregation Time: %f\t", t6-t4);
   }
-
-  printf("Result size: %d\t", result_row_ind.size());
 }
 
-void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv) {
+void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
   
-  call_filter(n, m, data, threshold, result_row_ind, argc, argv);
+  call_filter(n, m, data, threshold, result_row_ind);
 
   //sort the values stored in the vector
-  std::sort(result_row_ind.begin(),
-            result_row_ind.end());
+  std::sort(result_row_ind.begin(),result_row_ind.end());
 }
 
 void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind)
@@ -207,17 +150,20 @@ void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, co
   #pragma vector nontemporal
   #pragma vector aligned
   for(long i = 0; i < frameParams->num_frames*frameParams->n_borrow*frameParams->num_vectors; i++) {
-    if(frame->_pointers[i] > threshold) {
-      result_row_ind.emplace_back(4*i);
-    }
-    if(frame->__pointers[i] > threshold) {
-      result_row_ind.emplace_back(4*i+1);
-    }
-    if(frame->_apointers[i] > threshold) {
-      result_row_ind.emplace_back(4*i+2);
-    }
-    if(frame->_apointers[i] > threshold) {
-      result_row_ind.emplace_back(4*i+3);
+    #pragma omp critical
+    {
+      if(frame->_pointers[i] > threshold) {
+        result_row_ind.emplace_back(4*i);
+      }
+      if(frame->__pointers[i] > threshold) {
+        result_row_ind.emplace_back(4*i+1);
+      }
+      if(frame->_apointers[i] > threshold) {
+        result_row_ind.emplace_back(4*i+2);
+      }
+      if(frame->_apointers[i] > threshold) {
+        result_row_ind.emplace_back(4*i+3);
+      }
     }
   }
 }
@@ -228,10 +174,6 @@ void append_vec(std::vector<long> &v1, std::vector<long> &v2) {
 }
 
 /**
- * breadth
- * (1<<4) section offsets, (1<<4) task offsets, (1<<4) offsets, (1<<6) pointers
- * depth
- * (1<<2) pointers, (1<<3) vectors
  * (1<<3) offset_equator1, (1<<4) offset_equator2
  */
 void initialise_frames(Frame * frame, float * data, FrameParams * frameParams)
@@ -244,8 +186,6 @@ void initialise_frames(Frame * frame, float * data, FrameParams * frameParams)
 
 /**
  * execution (sum) of 18 members
- * breadth-first search
- * low performance tuning parameters as higher time to traverse through parallely
  */
 void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, const int p, const int frame_no) 
 {
@@ -268,16 +208,16 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data
         #pragma omp simd reduction(+: sum1, sum2, sum3, sum4, sum5, sum6, sum7, sum8)
         for(long aa = pp; aa < pp+frameParams->num_pointers; aa++) {
           float intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8 = 0.0f;
-          // float *ptr = &data[aa];
+          float *ptr = &data[aa];
           #pragma ivdep
           #pragma vector nontemporal
           #pragma vector aligned
           #pragma omp simd reduction(+: intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8)
           for(long j = aa; j <= aa+frameParams->num_offset - 4; j+=4) {
-            intersum1 += *data++;
-            intersum2 += *data++;
-            intersum3 += *data++;
-            intersum4 += *data++;
+            intersum1 += ptr[j-aa];
+            intersum2 += ptr[j-aa+1];
+            intersum3 += ptr[j-aa+2];
+            intersum4 += ptr[j-aa+3];
           }
           sum1 += intersum1;
           sum2 += intersum2;
@@ -297,12 +237,7 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data
   }
 }
 
-
-
 /**
- * trawl for n (nouns)
- * depth-first search
- * high performance tuning parameters as lower time to sum up the dependencies
  */
 void calculate_row_sum(Frame * frame, FrameParams * frameParams) 
 {
@@ -319,7 +254,6 @@ void calculate_row_sum(Frame * frame, FrameParams * frameParams)
 }
 
 /**
- * depth
  */
 void calculate_odd_row_sum(Frame * frame, FrameParams * frameParams) 
 {
@@ -336,7 +270,6 @@ void calculate_odd_row_sum(Frame * frame, FrameParams * frameParams)
 }
 
 /**
- * depth
  */
 void calculate_next_odd_row_sum(Frame * frame, FrameParams * frameParams) 
 {
@@ -353,7 +286,6 @@ void calculate_next_odd_row_sum(Frame * frame, FrameParams * frameParams)
 }
 
 /**
- * depth
  */
 void calculate_next2_odd_row_sum(Frame * frame, FrameParams * frameParams) 
 {
@@ -370,7 +302,6 @@ void calculate_next2_odd_row_sum(Frame * frame, FrameParams * frameParams)
 }
 
 /**
- * depth
  */
 void calculate_next3_odd_row_sum(Frame * frame, FrameParams * frameParams) 
 {
@@ -385,17 +316,6 @@ void calculate_next3_odd_row_sum(Frame * frame, FrameParams * frameParams)
     frame->__apointers[i] += frame->__apointers[i+16];
   }
 }
-
-// void calculate_net_sum(Frame * frame, const int m, int p,
-// std::vector<float>& sum) {
-//   // sum of m elements
-//   for(int i = 1; i <= (1<<10); i+=64) {
-//     for(int j = 1; j <= (1<<4); j++) {
-//       ptrdiff_t offset = (i-1)*(1<<4) + j-1;
-//       sum.emplace_back(frame->_pointers[0][offset]);
-//     }
-//   }
-// }
 
 void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int st, const int frame_no)
 {
