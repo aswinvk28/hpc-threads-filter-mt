@@ -104,7 +104,7 @@ void calculate_next2_odd_row_sum(Frame* frame, FrameParams * frameParams);
 void calculate_next3_odd_row_sum(Frame* frame, FrameParams * frameParams);
 void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int p, int frame_no);
 void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, int frame_no);
-void execute_section_wise_frames(Frame* frame, FrameParams * frameParams, float * data, std::thread * t);
+void execute_section_wise_frames(Frame* frame, FrameParams * frameParams, float * data);
 void aggregate_result(Frame* frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind);
 void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind, int argc, char** argv);
 
@@ -168,35 +168,26 @@ void call_filter(const long n, const long m, float *data, const float threshold,
   
   const double t3 = omp_get_wtime();
 
-  // std::thread t[frameParams->n_threads];
-
   // execution (sum) of 18 members
   // sections created to test
-  execute_section_wise_frames(frame, frameParams, data, nullptr);
+  execute_section_wise_frames(frame, frameParams, data);
 
   const double t4 = omp_get_wtime();
 
   printf("Task Time: %f\t", t4-t3);
 
-  // #pragma omp for
-  // for(int i = 0; i < (1<<4); i++) {
-  //   t[i].join();
-  // }
-
-  // const double t5 = omp_get_wtime();
-
-  // printf("Thread Time: %f\t", t5-t4);
-
   #pragma omp taskwait
   {
-    // calculate_row_sum(frames, frameParams);
-    // calculate_odd_row_sum(frames, frameParams);
+    // calculate_row_sum(frame, frameParams);
+    // calculate_odd_row_sum(frame, frameParams);
+    // const double t5 = omp_get_wtime();
+    // printf("simd breadth sum Time: %f\t", t5-t4);
     // calculate_next_odd_row_sum(frames, frameParams);
     // calculate_next2_odd_row_sum(frames, frameParams);
     // calculate_next3_odd_row_sum(frames, frameParams);
     aggregate_result(frame, frameParams, n, m, threshold, result_row_ind);
-    const double t5 = omp_get_wtime();
-    printf("aggregation Time: %f\t", t5-t4);
+    const double t6 = omp_get_wtime();
+    printf("aggregation Time: %f\t", t6-t4);
   }
 
   printf("Result size: %d\t", result_row_ind.size());
@@ -213,25 +204,22 @@ void filter(const long n, const long m, float *data, const float threshold, std:
 
 void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind)
 {
-  long idx = 0;
   #pragma vector nontemporal
   #pragma vector aligned
   for(long i = 0; i < frameParams->num_frames*frameParams->n_borrow*frameParams->num_vectors; i++) {
-    idx = 4*i;
     if(frame->_pointers[i] > threshold) {
-      result_row_ind.emplace_back(idx);
+      result_row_ind.emplace_back(4*i);
     }
     if(frame->__pointers[i] > threshold) {
-      result_row_ind.emplace_back(idx+1);
+      result_row_ind.emplace_back(4*i+1);
     }
     if(frame->_apointers[i] > threshold) {
-      result_row_ind.emplace_back(idx+2);
+      result_row_ind.emplace_back(4*i+2);
     }
     if(frame->_apointers[i] > threshold) {
-      result_row_ind.emplace_back(idx+3);
+      result_row_ind.emplace_back(4*i+3);
     }
   }
-  printf("final value of idx: %d\t", idx);
 }
 
 //helper function , refer instructions on the lab page
@@ -286,14 +274,6 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data
           #pragma vector aligned
           #pragma omp simd reduction(+: intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8)
           for(long j = aa; j <= aa+frameParams->num_offset - 4; j+=4) {
-            // intersum1 += data[frame_no*frameParams->num_index + d_offset + j];
-            // intersum2 += data[frame_no*frameParams->num_index + d_offset + j+1];
-            // intersum3 += data[frame_no*frameParams->num_index + d_offset + j+2];
-            // intersum4 += data[frame_no*frameParams->num_index + d_offset + j+3];
-            // intersum1 += ptr[j-aa];
-            // intersum2 += ptr[j-aa+1];
-            // intersum3 += ptr[j-aa+2];
-            // intersum4 += ptr[j-aa+3];
             intersum1 += *data++;
             intersum2 += *data++;
             intersum3 += *data++;
@@ -451,21 +431,10 @@ void execute_task_wise_frames(Frame * frame, FrameParams * frameParams, float * 
   }
 }
 
-void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float * data, std::thread * t)
+void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float * data)
 {
-  
-  // #pragma omp parallel 
-  // {
-    // #pragma omp single nowait
-    // {
-      #pragma omp for
-      for(int z = 1; z <= frameParams->n_threads; z++) {
-        // #pragma omp task
-        // {
-          // t[z-1] = thread(execute_task_wise_frames, frame, frameParams, data, z);
-          execute_task_wise_frames(frame, frameParams, data, z);
-        // }
-      }
-    // }
-  // }
+  #pragma omp for
+  for(int z = 1; z <= frameParams->n_threads; z++) {
+    execute_task_wise_frames(frame, frameParams, data, z);
+  }
 }
