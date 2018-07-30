@@ -131,19 +131,21 @@ float * data, float threshold, vector<long> &result_row_ind);
 
 void call_filter(const long n, const long m, float *data, const float threshold, vector<long> &result_row_ind)
 {
+  // n
   int num_frames = 1<<4;
   int num_vectors = 1<<3;
-  int num_objects = 1<<3;
   int num_tasks = 1<<4;
   int num_subtasks = 1<<4;
 
+  // m
   int num_codes = 1<<2;
   int num_pointers = 1<<4;
   int num_offset = 1<<12;
+  int num_objects = 1<<3;
 
   int n_borrow = 1<<5;
 
-  int n_threads = 1<<4;
+  int n_threads = 1<<3;
 
   FrameParams * frameParams = new FrameParams
   (num_frames, num_vectors, num_codes, num_pointers, num_offset, num_tasks, num_subtasks, num_objects, n_borrow, n_threads);
@@ -247,12 +249,9 @@ void initialise_frames(Frame * frame, float * data, FrameParams * frameParams)
  */
 void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, const int p, const int frame_no, vector<vector<float>>& pointers)
 {
-  const int p_index = (p%frameParams->n_borrow);
   const int STRIP = frameParams->num_codes*frameParams->num_pointers*frameParams->num_offset;
   const int WIDTH = frameParams->num_vectors*STRIP*(frame_no*frameParams->num_subindex + p);
-  int k = 0;
   for(long ii = WIDTH; ii < WIDTH + frameParams->num_vectors*STRIP; ii+=STRIP) {
-    unsigned long idx = (frame_no*frameParams->n_borrow + p_index)*frameParams->num_vectors + k++;
     float intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8 = 0.0f;
     float *mptr = &data[ii];
     for(long aa = ii; aa < ii+frameParams->num_pointers*frameParams->num_codes; aa++) {
@@ -325,7 +324,7 @@ void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float
   // for(int z = 1; z <= frameParams->n_threads; z++) {
   //   execute_task_wise_frames(frame, frameParams, data, z);
   // }
-  #pragma omp parallel num_threads(16)
+  #pragma omp parallel num_threads(8)
   {
     int z = omp_get_thread_num();
     execute_task_wise_frames(frame, frameParams, data, z+1, pointers);

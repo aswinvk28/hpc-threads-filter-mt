@@ -59,7 +59,6 @@ int main(int argc, char** argv) {
   if(ref_result_row_ind.size() != result_row_ind.size()) {
     // Result sizes did not match
     printf("Error: The reference and result vectors have different sizes: %ld %ld",ref_result_row_ind.size(), result_row_ind.size());
-    printf("Time: %f\n", t1-t0);
   } else {
     bool passed = true;
     for(long i = 0; i < ref_result_row_ind.size(); i++) {
