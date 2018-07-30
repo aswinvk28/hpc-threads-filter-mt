@@ -109,33 +109,37 @@ Frame::~Frame() {
   __cpointers.shrink_to_fit();
 }
 
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, long p, int frame_no);
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, long p, int frame_no, vector<vector<float>>& pointers);
 void initialise_frames(Frame* frame, float * data, FrameParams * frameParams);
 void calculate_row_sum(Frame* frame, FrameParams * frameParams);
 void calculate_odd_row_sum(Frame* frame, FrameParams * frameParams);
 void calculate_next_odd_row_sum(Frame* frame, FrameParams * frameParams);
 void calculate_next2_odd_row_sum(Frame* frame, FrameParams * frameParams);
 void calculate_next3_odd_row_sum(Frame* frame, FrameParams * frameParams);
-void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int p, int frame_no);
-void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, int frame_no);
-void execute_section_wise_frames(Frame* frame, FrameParams * frameParams, float * data);
-void aggregate_result(Frame* frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind);
-void aggregate_sum_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, vector<float>& sum);
-void measure_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, vector<float> sum, std::vector<long> &result_row_ind);
+void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int p, int frame_no, vector<vector<float>>& pointers);
+void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, int frame_no, vector<vector<float>>& pointers);
+void execute_section_wise_frames(Frame* frame, FrameParams * frameParams, float * data, vector<vector<float>>& pointers);
+void aggregate_result(Frame* frame, FrameParams * frameParams, const long n, const long m, 
+float threshold, vector<long> &result_row_ind);
+void aggregate_sum_result(Frame * frame, FrameParams * frameParams, const long n, const long m, 
+float threshold, vector<float>& sum, vector<vector<float>> pointers);
+void measure_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, 
+vector<float> sum, vector<long> &result_row_ind);
 void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind);
-void calculate_total_sum(const long n, const long m, Frame * frame, FrameParams * frameParams, float * data, float threshold, std::vector<long> &result_row_ind);
+void calculate_total_sum(const long n, const long m, Frame * frame, FrameParams * frameParams, 
+float * data, float threshold, vector<long> &result_row_ind);
 
-void call_filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind)
+void call_filter(const long n, const long m, float *data, const float threshold, vector<long> &result_row_ind)
 {
   int num_frames = 1<<4;
   int num_vectors = 1<<3;
   int num_objects = 1<<3;
+  int num_tasks = 1<<4;
+  int num_subtasks = 1<<4;
 
   int num_codes = 1<<2;
   int num_pointers = 1<<4;
   int num_offset = 1<<12;
-  int num_tasks = 1<<4;
-  int num_subtasks = 1<<4;
 
   int n_borrow = 1<<5;
 
@@ -145,18 +149,19 @@ void call_filter(const long n, const long m, float *data, const float threshold,
   (num_frames, num_vectors, num_codes, num_pointers, num_offset, num_tasks, num_subtasks, num_objects, n_borrow, n_threads);
 
   Frame * frame = new Frame(frameParams);
-  initialise_frames(frame, data, frameParams);
+  // initialise_frames(frame, data, frameParams);
+
+  vector<vector<float>> pointers = vector<vector<float>>(8, vector<float>(0));
+  vector<float> sum;
   
   // execution (sum) of 18 members
-  execute_section_wise_frames(frame, frameParams, data);
+  execute_section_wise_frames(frame, frameParams, data, pointers);
 
-  vector<float> sum(n);
-
-  aggregate_sum_result(frame, frameParams, n, m, threshold, sum);
+  aggregate_sum_result(frame, frameParams, n, m, threshold, sum, pointers);
   measure_result(frame, frameParams, n, m, threshold, sum, result_row_ind);
 }
 
-void filter(const long n, const long m, float *data, const float threshold, std::vector<long> &result_row_ind) {
+void filter(const long n, const long m, float *data, const float threshold, vector<long> &result_row_ind) {
   
   call_filter(n, m, data, threshold, result_row_ind);
 
@@ -164,7 +169,8 @@ void filter(const long n, const long m, float *data, const float threshold, std:
   std::sort(result_row_ind.begin(),result_row_ind.end());
 }
 
-void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, std::vector<long> &result_row_ind)
+void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, const long m, 
+float threshold, vector<long> &result_row_ind)
 {
   for(long i = 0; i < frameParams->num_frames*frameParams->n_borrow*frameParams->num_vectors; i++) {
     if(frame->_pointers[i] > threshold) {
@@ -194,21 +200,21 @@ void aggregate_result(Frame * frame, FrameParams * frameParams, const long n, co
   }
 }
 
-void aggregate_sum_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, vector<float>& sum)
+void aggregate_sum_result(Frame * frame, FrameParams * frameParams, const long n, const long m, 
+float threshold, vector<float>& sum, vector<vector<float>> pointers)
 {
   #pragma ivdep
-  #pragma omp simd
   for(long i = 0; i < n; i++) {
-    sum[i] = frame->_pointers[i] + frame->__pointers[i] + 
-    frame->_apointers[i] + frame->__apointers[i] + 
-    frame->_bpointers[i] + frame->__bpointers[i] + 
-    frame->_cpointers[i] + frame->__cpointers[i];
+    sum.push_back(pointers[0][i] + pointers[1][i] + 
+    pointers[2][i] + pointers[3][i] + 
+    pointers[4][i] + pointers[5][i] + 
+    pointers[6][i] + pointers[7][i]);
   }
 }
 
-void measure_result(Frame * frame, FrameParams * frameParams, const long n, const long m, float threshold, vector<float> sum, std::vector<long> &result_row_ind)
+void measure_result(Frame * frame, FrameParams * frameParams, const long n, const long m, 
+float threshold, vector<float> sum, vector<long> &result_row_ind)
 {
-  #pragma omp simd
   for(long i = 0; i < n; i++) {
     if(sum[i] > threshold) {
       result_row_ind.push_back(i);
@@ -226,34 +232,33 @@ void append_vec(std::vector<long> &v1, std::vector<long> &v2) {
  */
 void initialise_frames(Frame * frame, float * data, FrameParams * frameParams)
 {
-  fill(frame->_pointers.begin(), frame->_pointers.end(), 0.0);
-  fill(frame->__pointers.begin(), frame->__pointers.end(), 0.0);
-  fill(frame->_apointers.begin(), frame->_apointers.end(), 0.0);
-  fill(frame->__apointers.begin(), frame->__apointers.end(), 0.0);
-  fill(frame->_bpointers.begin(), frame->_bpointers.end(), 0.0);
-  fill(frame->__bpointers.begin(), frame->__bpointers.end(), 0.0);
-  fill(frame->_cpointers.begin(), frame->_cpointers.end(), 0.0);
-  fill(frame->__cpointers.begin(), frame->__cpointers.end(), 0.0);
+  // fill(pointers[0].begin(), pointers[0].end(), 0.0);
+  // fill(pointers[1].begin(), pointers[1].end(), 0.0);
+  // fill(pointers[2].begin(), pointers[2].end(), 0.0);
+  // fill(pointers[3].begin(), pointers[3].end(), 0.0);
+  // fill(pointers[4].begin(), pointers[4].end(), 0.0);
+  // fill(pointers[5].begin(), pointers[5].end(), 0.0);
+  // fill(pointers[6].begin(), pointers[6].end(), 0.0);
+  // fill(pointers[7].begin(), pointers[7].end(), 0.0);
 }
 
 /**
  * execution (sum) of 18 members
  */
-void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, const int p, const int frame_no) 
+void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data, const int p, const int frame_no, vector<vector<float>>& pointers)
 {
   const int p_index = (p%frameParams->n_borrow);
   const int STRIP = frameParams->num_codes*frameParams->num_pointers*frameParams->num_offset;
+  const int WIDTH = frameParams->num_vectors*STRIP*(frame_no*frameParams->num_subindex + p);
   int k = 0;
-  #pragma omp for
-  for(long ii = 0; ii < frameParams->num_vectors*STRIP; ii+=STRIP) {
+  for(long ii = WIDTH; ii < WIDTH + frameParams->num_vectors*STRIP; ii+=STRIP) {
     unsigned long idx = (frame_no*frameParams->n_borrow + p_index)*frameParams->num_vectors + k++;
     float intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8 = 0.0f;
     float *mptr = &data[ii];
-    #pragma omp parallel for
     for(long aa = ii; aa < ii+frameParams->num_pointers*frameParams->num_codes; aa++) {
       float *ptr = &mptr[aa-ii];
-      #pragma omp parallel for reduction(+: intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8)
-      for(long j = aa; j <= aa+frameParams->num_offset - 8; j+=8) {
+      #pragma omp simd reduction(+: intersum1, intersum2, intersum3, intersum4, intersum5, intersum6, intersum7, intersum8)
+      for(long j = aa; j < aa+frameParams->num_offset - 8; j+=8) {
         intersum1 += ptr[j-aa];
         intersum2 += ptr[j-aa+1];
         intersum3 += ptr[j-aa+2];
@@ -264,18 +269,21 @@ void calculate_vector_sum(Frame * frame, FrameParams * frameParams, float * data
         intersum8 += ptr[j-aa+7];
       }
     }
-    frame->_pointers[idx] = intersum1;
-    frame->__pointers[idx] = intersum2;
-    frame->_apointers[idx] = intersum3;
-    frame->__apointers[idx] = intersum4;
-    frame->_bpointers[idx] = intersum5;
-    frame->__bpointers[idx] = intersum6;
-    frame->_cpointers[idx] = intersum7;
-    frame->__cpointers[idx] = intersum8;
+    #pragma omp critical
+    {
+      pointers[0].push_back(intersum1);
+      pointers[1].push_back(intersum2);
+      pointers[2].push_back(intersum3);
+      pointers[3].push_back(intersum4);
+      pointers[4].push_back(intersum5);
+      pointers[5].push_back(intersum6);
+      pointers[6].push_back(intersum7);
+      pointers[7].push_back(intersum8);
+    }
   }
 }
 
-void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int st, const int frame_no)
+void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data, int st, const int frame_no, vector<vector<float>>& pointers)
 {
   // #pragma omp single nowait
   // {
@@ -283,13 +291,13 @@ void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data
     for(int i = st; i < st+frameParams->num_subtasks; i++) {
       // #pragma omp task
       // {
-        calculate_vector_sum(frame, frameParams, data, i, frame_no);
+        calculate_vector_sum(frame, frameParams, data, i, frame_no, pointers);
       // }
     }
   // }
 }
 
-void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, const int frame_no)
+void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float * data, const int frame_no, vector<vector<float>>& pointers)
 {
   // #pragma omp single nowait
   // {
@@ -297,21 +305,21 @@ void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float *
     for(int i = 1; i <= frameParams->num_tasks; i++) {
       // #pragma omp task
       // {
-        execute_task_for_sum(frame, frameParams, data, (i-1)*frameParams->num_subtasks, frame_no);
+        execute_task_for_sum(frame, frameParams, data, (i-1)*frameParams->num_subtasks, frame_no, pointers);
       // }
     }
   // }
 }
 
-void execute_task_wise_frames(Frame * frame, FrameParams * frameParams, float * data, const int z)
+void execute_task_wise_frames(Frame * frame, FrameParams * frameParams, float * data, const int z, vector<vector<float>>& pointers)
 {
   // #pragma omp for
   for(int i = (z-1)*frameParams->num_frames/frameParams->n_threads; i < z*frameParams->num_frames/frameParams->n_threads; i++) {
-    execute_section_for_frame(frame, frameParams, data, i);
+    execute_section_for_frame(frame, frameParams, data, i, pointers);
   }
 }
 
-void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float * data)
+void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float * data, vector<vector<float>>& pointers)
 {
   // #pragma omp for
   // for(int z = 1; z <= frameParams->n_threads; z++) {
@@ -320,6 +328,6 @@ void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float
   #pragma omp parallel num_threads(16)
   {
     int z = omp_get_thread_num();
-    execute_task_wise_frames(frame, frameParams, data, z+1);
+    execute_task_wise_frames(frame, frameParams, data, z+1, pointers);
   }
 }
