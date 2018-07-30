@@ -41,9 +41,9 @@ int main(int argc, char** argv) {
   vslNewStream( &rnStream, VSL_BRNG_MT19937, random_seed);
 
   //initialize 2D data
-// #pragma omp parallel for 
-//   for(long i =0; i < n; i++)
-    // vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, m*n, &data[0], -1.0, 1.0);
+//  #pragma omp parallel for 
+//    for(long i =0; i < n; i++)
+//     vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, m, &data[i*m], -1.0, 1.0);
 
   std::vector<long> ref_result_row_ind; 
   //compute the refernce data using unoptimized refernce function defined above
