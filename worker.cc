@@ -290,6 +290,7 @@ void execute_task_for_sum(Frame * frame, FrameParams * frameParams, float * data
     for(int i = st; i < st+frameParams->num_subtasks; i++) {
       // #pragma omp task
       // {
+        #pragma omp ordered
         calculate_vector_sum(frame, frameParams, data, i, frame_no, pointers);
       // }
     }
@@ -304,6 +305,7 @@ void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float *
     for(int i = 1; i <= frameParams->num_tasks; i++) {
       // #pragma omp task
       // {
+        #pragma omp ordered
         execute_task_for_sum(frame, frameParams, data, (i-1)*frameParams->num_subtasks, frame_no, pointers);
       // }
     }
@@ -312,8 +314,8 @@ void execute_section_for_frame(Frame * frame, FrameParams * frameParams, float *
 
 void execute_task_wise_frames(Frame * frame, FrameParams * frameParams, float * data, const int z, vector<vector<float>>& pointers)
 {
-  // #pragma omp for
   for(int i = (z-1)*frameParams->num_frames/frameParams->n_threads; i < z*frameParams->num_frames/frameParams->n_threads; i++) {
+    #pragma omp ordered
     execute_section_for_frame(frame, frameParams, data, i, pointers);
   }
 }
@@ -324,9 +326,10 @@ void execute_section_wise_frames(Frame * frame, FrameParams * frameParams, float
   // for(int z = 1; z <= frameParams->n_threads; z++) {
   //   execute_task_wise_frames(frame, frameParams, data, z);
   // }
-  #pragma omp parallel num_threads(8)
+  int k = 0;
+  #pragma omp parallel num_threads(8) shared(k)
   {
     int z = omp_get_thread_num();
-    execute_task_wise_frames(frame, frameParams, data, z+1, pointers);
+    execute_task_wise_frames(frame, frameParams, data, ++k, pointers);
   }
 }
