@@ -23,7 +23,7 @@ struct FrameParams
   int num_offset = 1<<10;
 
   int n_threads = 1<<6;
-  int intersum_size = 256;
+  int intersum_size = 512;
   int num_subindex = 0;
   int num_product = 0;
   int num_division = 0;
@@ -39,7 +39,7 @@ struct FrameParams
 	}
 };
 
-void calculate_vector_sum(FrameParams * frameParams, float * data, long p, int frame_no, vector<vector<float>>& pointers);
+void calculate_vector_sum(FrameParams * frameParams, float * data, const long p, const int frame_no, vector<vector<float>>& pointers);
 void initialise_frames(float * data, FrameParams * frameParams);
 void calculate_row_sum(FrameParams * frameParams);
 void calculate_odd_row_sum(FrameParams * frameParams);
@@ -92,7 +92,7 @@ void filter(const long n, const long m, float *data, const float threshold, vect
 void measure_result(FrameParams * frameParams, const long n, const long m, 
 float threshold, vector<float> sum, vector<long> &result_row_ind)
 {
-  for(long i = 0; i < n; i++) {
+  for(size_t i = 0; i < n; i++) {
     if(sum[i] > threshold) {
       result_row_ind.push_back(i);
     }
@@ -122,16 +122,17 @@ void initialise_frames(float * data, FrameParams * frameParams)
 /**
  * execution (sum) of 18 members
  */
-void calculate_vector_sum(FrameParams * frameParams, float * data, const int p, const int frame_no, vector<vector<float>>& pointers)
+void calculate_vector_sum(FrameParams * frameParams, float * data, const long p, const int frame_no, vector<vector<float>>& pointers)
 {
-  const int STRIP = frameParams->num_pointers*frameParams->num_offset;
+  const size_t STRIP = frameParams->num_pointers*frameParams->num_offset;
   float intersum = 0.0f;
-  for(long ii = 0; ii < frameParams->num_codes*STRIP; ii+=STRIP) {
-    for(long j = 0; j <= frameParams->num_offset*frameParams->num_pointers - frameParams->intersum_size; j+=frameParams->intersum_size) {
+  #pragma omp parallel for
+  for(size_t ii = 0; ii < frameParams->num_codes*STRIP; ii+=STRIP) {
+    for(size_t j = ii; j <= ii+frameParams->num_offset*frameParams->num_pointers - frameParams->intersum_size; j+=frameParams->intersum_size) {
       #pragma omp simd reduction(+:intersum)
       #pragma vector nontemporal
-      for(int k = 0; k < frameParams->intersum_size; k++) {
-        intersum += *data++;
+      for(ptrdiff_t k = j; k < j+frameParams->intersum_size; k++) {
+        intersum += data[k];
       }
     }
   }
@@ -143,12 +144,12 @@ void calculate_vector_sum(FrameParams * frameParams, float * data, const int p, 
 
 void execute_task_for_sum(FrameParams * frameParams, float * data, int st, const int frame_no, vector<vector<float>>& pointers)
 {
-  const int r = frameParams->num_division*frameParams->num_offset;
+  const size_t r = frameParams->num_division*frameParams->num_offset;
   #pragma omp parallel
   {
     #pragma omp master
     {
-      for(int i = st; i < st+frameParams->num_subtasks; i++) {
+      for(ptrdiff_t i = st; i < st+frameParams->num_subtasks; i++) {
         #pragma omp task depend(in:data[(i-st+1)*r:r]) depend(out:data[(i-st)*r:r])
         {
           calculate_vector_sum(frameParams, &data[(i-st)*r], i, frame_no, pointers);
@@ -160,12 +161,12 @@ void execute_task_for_sum(FrameParams * frameParams, float * data, int st, const
 
 void execute_section_for_frame(FrameParams * frameParams, float * data, const int frame_no, vector<vector<float>>& pointers)
 {
-  const int r = frameParams->num_subtasks*frameParams->num_division*frameParams->num_offset;
+  const size_t r = frameParams->num_subtasks*frameParams->num_division*frameParams->num_offset;
   #pragma omp parallel
   {
     #pragma omp master
     {
-      for(int i = 1; i <= frameParams->num_tasks; i++) {
+      for(ptrdiff_t i = 1; i <= frameParams->num_tasks; i++) {
         #pragma omp task depend(in:data[(i+1)*r:r]) depend(out:data[i*r:r])
         {
           execute_task_for_sum(frameParams, &data[(i-1)*r], (i-1)*frameParams->num_subtasks, frame_no, pointers);
@@ -177,7 +178,7 @@ void execute_section_for_frame(FrameParams * frameParams, float * data, const in
 
 void execute_task_wise_frames(FrameParams * frameParams, float * data, const int z, vector<vector<float>>& pointers)
 {
-  for(int i = (z-1)*frameParams->num_frames/frameParams->n_threads; i < z*frameParams->num_frames/frameParams->n_threads; i++) {
+  for(ptrdiff_t i = (z-1)*frameParams->num_frames/frameParams->n_threads; i < z*frameParams->num_frames/frameParams->n_threads; i++) {
     execute_section_for_frame(frameParams, 
     &data[i*frameParams->num_index], i, pointers);
   }
@@ -188,7 +189,6 @@ void execute_section_wise_frames(FrameParams * frameParams, float * data, vector
   int k = 0;
   #pragma omp parallel num_threads(64) shared(k)
   {
-    int z = omp_get_thread_num();
     execute_task_wise_frames(frameParams, data, ++k, pointers);
   }
 }
