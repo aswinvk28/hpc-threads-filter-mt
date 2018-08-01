@@ -75,10 +75,12 @@ void append_vec(std::vector<long> &v1, std::vector<long> &v2) {
 void calculate_vector_sum(FrameParams * frameParams, float * data, const long p, const int frame_no, vector<float>& pointers)
 {
   const size_t STRIP = frameParams->num_pointers*frameParams->num_offset;
-  float intersum = 0.0f;
+  register float intersum = 0.0f;
   for(size_t ii = 0; ii < frameParams->num_codes*STRIP; ii+=STRIP) {
     for(size_t j = ii; j <= ii+frameParams->num_offset*frameParams->num_pointers - frameParams->intersum_size; j+=frameParams->intersum_size) {
       #pragma omp simd reduction(+:intersum)
+      #pragma vector nontemporal
+      #pragma vector aligned
       for(ptrdiff_t k = j; k < j+frameParams->intersum_size; k++) {
         intersum += data[k];
       }
