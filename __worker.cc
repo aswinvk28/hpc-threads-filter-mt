@@ -109,6 +109,7 @@ float calculate_vector_sum(FrameParams * frameParams, float * data, const int fr
       }
     }
   }
+  #pragma omp barrier
   #pragma omp critical
   {
     pointers.push_back(intersum);

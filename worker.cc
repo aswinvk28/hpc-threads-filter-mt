@@ -137,12 +137,6 @@ void filter(const long n, const long m, float *data, const float threshold, vect
   // execution (sum) of 18 members
   execute_section_wise_frames(frameParams, data);
 
-  /*#pragma omp taskwait
-  {
-    aggregate_result(n, m, frameParams, 2);
-    aggregate_result(n, m, frameParams, 4);
-  }*/
-
   measure_result(frameParams, n, m, threshold, result_row_ind);
 
   //sort the values stored in the vector

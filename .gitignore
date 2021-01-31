@@ -2,3 +2,7 @@
 *.o
 *.dat
 .vscode
+_worker.cc
+__worker.cc
+.gitignore
+.vscode
